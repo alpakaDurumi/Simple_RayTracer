@@ -2,10 +2,10 @@
 #include "Sphere.h"
 #include "Hit.h"
 #include "Ray.h"
+#include "Triangle.h"
 
 RayTracer::RayTracer(const int& width, const int& height)
-	: width(width), height(height)
-{
+	: width(width), height(height) {
 	// -z 방향에 광원
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
@@ -20,6 +20,11 @@ RayTracer::RayTracer(const int& width, const int& height)
 	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
 	sphere2->configureSpecular(10.0f, 1.0f);
 	objects.push_back(sphere2);
+
+	// Cyan 삼각형
+	auto triangle1 = std::make_shared<Triangle>(glm::vec3(-2.0f, -2.0f, 4.0f), glm::vec3(0.0f, 2.0f, 4.0f), glm::vec3(2.0f, -2.0f, 4.0f));
+	triangle1->setColor(glm::vec3{ 0.0f, 1.0f, 1.0f });
+	objects.push_back(triangle1);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환

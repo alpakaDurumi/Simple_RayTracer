@@ -3,8 +3,7 @@
 #include "Ray.h"
 
 Sphere::Sphere(const glm::vec3& center, const float radius, const glm::vec3& color)
-    : center(center), radius(radius), Object(color) {
-}
+    : center(center), radius(radius), Object(color) {}
 
 Hit Sphere::CheckRayCollision(Ray& ray) {
     Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) };
