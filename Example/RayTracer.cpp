@@ -10,20 +10,19 @@ RayTracer::RayTracer(const int& width, const int& height)
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
 	// 초록색 구
-	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 1.0f);
+	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
 	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
 	sphere1->configureSpecular(10.0f, 1.0f);
 	objects.push_back(sphere1);
 
 	// 보라색 구
-	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 3.0f), 1.0f);
+	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
 	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
 	sphere2->configureSpecular(10.0f, 1.0f);
 	objects.push_back(sphere2);
 
-	// Cyan 삼각형
-	auto triangle1 = std::make_shared<Triangle>(glm::vec3(-2.0f, -2.0f, 4.0f), glm::vec3(0.0f, 2.0f, 4.0f), glm::vec3(2.0f, -2.0f, 4.0f));
-	triangle1->setColor(glm::vec3{ 0.0f, 1.0f, 1.0f });
+	// 흰색 삼각형
+	auto triangle1 = std::make_shared<Triangle>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 6.0f), glm::vec3(4.0f, -1.0f, 6.0f));
 	objects.push_back(triangle1);
 }
 
@@ -63,18 +62,26 @@ glm::vec3 RayTracer::traceRay(Ray& ray, const int recurseLevel) {
 	// hit.d가 0보다 작다는 것은 어느 물체와도 충돌하지 않았다는 뜻
 	if (hit.d >= 0.0f) {
 		glm::vec3 objectColor(0.0f);
-		glm::vec3 phongColor(0.0f);
+		glm::vec3 phongColor(hit.obj->material.amb);	// ambient 값으로 초기화
 
 		const glm::vec3 dirToLight = glm::normalize(light.pos - hit.point);
 
-		// Diffuse 계산
-		const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
+		// 그림자 계산을 위한 Ray
+		Ray shadowRay{ hit.point + dirToLight * 1e-4f, dirToLight };
+		// 충돌 지점에서 광원 사이를 막는 물체까지의 거리
+		float distanceToObstacle = FindClosestCollision(shadowRay).d;
 
-		// Specular 계산
-		const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, hit.normal) * hit.normal - dirToLight;
-		const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->material.specularPower);
+		// 충돌 지점과 광원 사이에 가로막는 물체가 없다면 diffuse와 specular를 추가로 계산
+		if (distanceToObstacle < 0.0f || glm::length(light.pos - hit.point) < distanceToObstacle) {
+			// Diffuse 계산
+			const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
 
-		phongColor += hit.obj->material.amb + hit.obj->material.dif * diff + hit.obj->material.spec * specular * hit.obj->material.specularCoefficient;
+			// Specular 계산
+			const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, hit.normal) * hit.normal - dirToLight;
+			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->material.specularPower);
+
+			phongColor += hit.obj->material.amb + hit.obj->material.dif * diff + hit.obj->material.spec * specular * hit.obj->material.specularCoefficient;
+		}
 
 		objectColor += phongColor * (1.0f - hit.obj->material.reflection - hit.obj->material.transparency);
 

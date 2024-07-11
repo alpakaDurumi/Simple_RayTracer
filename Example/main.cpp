@@ -83,7 +83,7 @@ int main()
 			ImGui::NewFrame();
 			// 광원 위치 조절
 			ImGui::Begin("Light");
-			ImGui::SliderFloat3("pos", &renderer->rayTracer.light.pos.x, -5.0f, 5.0f);
+			ImGui::SliderFloat3("pos", &renderer->rayTracer.light.pos.x, -10.0f, 10.0f);
 			ImGui::End();
 			ImGui::Render();
 
