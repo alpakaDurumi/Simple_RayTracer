@@ -12,13 +12,13 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// 초록색 구
 	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
 	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	sphere1->configureSpecular(10.0f, 1.0f);
+	sphere1->configureSpecular(40.0f, 1.0f);
 	objects.push_back(sphere1);
 
 	// 보라색 구
 	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
 	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
-	sphere2->configureSpecular(10.0f, 1.0f);
+	sphere2->configureSpecular(40.0f, 1.0f);
 	objects.push_back(sphere2);
 
 	// 흰색 삼각형
@@ -80,7 +80,7 @@ glm::vec3 RayTracer::traceRay(Ray& ray, const int recurseLevel) {
 			const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, hit.normal) * hit.normal - dirToLight;
 			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->material.specularPower);
 
-			phongColor += hit.obj->material.amb + hit.obj->material.dif * diff + hit.obj->material.spec * specular * hit.obj->material.specularCoefficient;
+			phongColor += hit.obj->material.dif * diff + hit.obj->material.spec * specular * hit.obj->material.specularCoefficient;
 		}
 
 		objectColor += phongColor * (1.0f - hit.obj->material.reflection - hit.obj->material.transparency);
