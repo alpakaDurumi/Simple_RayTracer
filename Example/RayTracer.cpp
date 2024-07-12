@@ -3,6 +3,7 @@
 #include "Hit.h"
 #include "Ray.h"
 #include "Triangle.h"
+#include "Square.h"
 
 RayTracer::RayTracer(const int& width, const int& height)
 	: width(width), height(height) {
@@ -21,9 +22,9 @@ RayTracer::RayTracer(const int& width, const int& height)
 	sphere2->configureSpecular(40.0f, 1.0f);
 	objects.push_back(sphere2);
 
-	// 흰색 삼각형
-	auto triangle1 = std::make_shared<Triangle>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 6.0f), glm::vec3(4.0f, -1.0f, 6.0f));
-	objects.push_back(triangle1);
+	// 흰색 사각형
+	auto square1 = std::make_shared<Square>(glm::vec3(-4.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 0.0f));
+	objects.push_back(square1);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
