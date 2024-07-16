@@ -14,9 +14,13 @@ class Ray;
 class Triangle : public Object {
 public:
     glm::vec3 v0, v1, v2;       // ¼¼ Á¤Á¡ÀÇ ÁÂÇ¥
+    glm::vec2 uv0, uv1, uv2;    // ÅØ½ºÃ³ ÁÂÇ¥
 
 public:
-    Triangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& color = glm::vec3(1.0f));
+    Triangle(
+        const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+        const glm::vec2& uv0 = glm::vec2(0.0f), const glm::vec2& uv1 = glm::vec2(0.0f), const glm::vec2& uv2 = glm::vec2(0.0f),
+        const glm::vec3& color = glm::vec3(1.0f));
     virtual Hit CheckRayCollision(Ray& ray);
     void IntersectRayTriangle(const Ray& ray, Hit& hit);
 };

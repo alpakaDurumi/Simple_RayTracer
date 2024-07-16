@@ -2,8 +2,11 @@
 #include "Hit.h"
 #include "Ray.h"
 
-Triangle::Triangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& color)
-    : v0(v0), v1(v1), v2(v2), Object(color) {}
+Triangle::Triangle(
+    const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+    const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2,
+    const glm::vec3& color)
+    : v0(v0), v1(v1), v2(v2), uv0(uv0), uv1(uv1), uv2(uv2), Object(color) {}
 
 Hit Triangle::CheckRayCollision(Ray& ray) {
     Hit hit = Hit{ -1.0, glm::vec3(0.0), glm::vec3(0.0) };
@@ -37,15 +40,15 @@ void Triangle::IntersectRayTriangle(const Ray& ray, Hit& hit) {
     // 평면과 Ray의 충돌 위치 계산
     const glm::vec3 point = ray.start + distance * ray.dir;
 
-    // 충돌 위치를 이용하여 작은 삼각형 3개의 노멀 벡터 계산
-    const glm::vec3 normal0 = glm::normalize(glm::cross(point - v0, v2 - v0));
-    const glm::vec3 normal1 = glm::normalize(glm::cross(point - v1, v0 - v1));
-    const glm::vec3 normal2 = glm::normalize(glm::cross(point - v2, v1 - v2));
+    // 충돌 위치를 이용하여 각 변을 기준으로 cross product 계산
+    const glm::vec3 cross0 = glm::cross(point - v2, v1 - v2);
+    const glm::vec3 cross1 = glm::cross(point - v0, v2 - v0);
+    const glm::vec3 cross2 = glm::cross(point - v1, v0 - v1);
 
     // 하나라도 방향이 다르다면 충돌하지 않은 것
-    if (glm::dot(normal0, faceNormal) < 0.0f ||
-        glm::dot(normal1, faceNormal) < 0.0f ||
-        glm::dot(normal2, faceNormal) < 0.0f)
+    if (glm::dot(cross0, faceNormal) < 0.0f ||
+        glm::dot(cross1, faceNormal) < 0.0f ||
+        glm::dot(cross2, faceNormal) < 0.0f)
         collided = false;
 
     // 충돌한 경우에만 Hit의 값들을 설정
@@ -53,5 +56,25 @@ void Triangle::IntersectRayTriangle(const Ray& ray, Hit& hit) {
         hit.d = distance;
         hit.point = point;
         hit.normal = faceNormal;
+
+        // 텍스처를 사용한다면 텍스처 좌표 계산(Barycentric coordinates)
+        //if (material.ambTexture || material.difTexture) {
+            const float area0 = glm::length(cross0) * 0.5f;    // v1v2 기준
+            const float area1 = glm::length(cross1) * 0.5f;    // v0v2 기준
+            const float area2 = glm::length(cross2) * 0.5f;    // v0v1 기준
+
+            const float u = area0 / (area0 + area1 + area2);
+            const float v = area1 / (area0 + area1 + area2);
+            const float w = 1.0f - u - v;
+
+            hit.uv = uv0 * u + uv1 * v + uv2 * w;
+        //}
+
+        // 임시 코드
+        //const auto color0 = glm::vec3(1.0f, 0.0f, 0.0f); // 빨강
+        //const auto color1 = glm::vec3(0.0f, 1.0f, 0.0f); // 초록
+        //const auto color2 = glm::vec3(0.0f, 0.0f, 1.0f); // 파랑
+
+        //hit.pointColor = color0 * u + color1 * v + color2 * w;
     }
 }

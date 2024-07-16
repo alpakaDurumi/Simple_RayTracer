@@ -16,12 +16,12 @@ struct Material {
     glm::vec3 spec = glm::vec3(0.0f);       // Specular color
 
     float specularPower = 10.0f;            // Specular 강도
-    float specularCoefficient = 0.5f;            // Specular 계수
+    float specularCoefficient = 0.5f;       // Specular 계수
     float reflection = 0.0f;                // 반사
     float transparency = 0.0f;              // 투명도
 
-    //std::shared_ptr<Texture> ambTexture;    // Ambient 텍스처
-    //std::shared_ptr<Texture> difTexture;    // Diffuse 텍스처
+    std::shared_ptr<Texture> ambTexture;    // Ambient 텍스처
+    std::shared_ptr<Texture> difTexture;    // Diffuse 텍스처
 };
 
 class Object
