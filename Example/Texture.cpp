@@ -4,7 +4,8 @@
 #include "Texture.h"
 
 // 이미지 파일 이름을 지정하여 읽어오는 생성자
-Texture::Texture(const std::string& filename) {
+Texture::Texture(const std::string& filename, TextureAddressMode addressMode, TextureFilterMode filterMode)
+	: addressMode(addressMode), filterMode(filterMode) {
 	unsigned char* img = stbi_load(filename.c_str(), &width, &height, &channels, 0);
 
 	image.resize(width * height * channels);
@@ -14,8 +15,8 @@ Texture::Texture(const std::string& filename) {
 }
 
 // 배열에서 색상 값을 읽어오는 생성자
-Texture::Texture(const int& width, const int& height, const std::vector<glm::vec3>& pixels)
-	: width(width), height(height), channels(3) {
+Texture::Texture(const int& width, const int& height, const std::vector<glm::vec3>& pixels, TextureAddressMode addressMode, TextureFilterMode filterMode)
+	: width(width), height(height), channels(3), addressMode(addressMode), filterMode(filterMode) {
 	image.resize(width * height * channels);
 
 	for (int j = 0; j < height; j++) {
@@ -27,6 +28,14 @@ Texture::Texture(const int& width, const int& height, const std::vector<glm::vec
 			image[(i + width * j) * channels + 2] = uint8_t(color.b * 255);
 		}
 	}
+}
+
+void Texture::SetAddressMode(TextureAddressMode addressMode) {
+	this->addressMode = addressMode;
+}
+
+void Texture::SetFilterMode(TextureFilterMode filterMode) {
+	this->filterMode = filterMode;
 }
 
 // texture addressing mode : Clamp
@@ -78,13 +87,17 @@ glm::vec3 Texture::SamplePoint(const glm::vec2& uv)  {
 	int i = glm::round(xy.x);
 	int j = glm::round(xy.y);
 
-	// Wrap 또는 Clamp : bool 변수에 따라 결정되도록 하기
-	// 각 오브젝트마다 IMGUI로 조절하는 것도 좋을 듯
-	return GetClamped(i, j);
-	//return GetWrapped(i, j);
+	switch (addressMode) {
+	case TextureAddressMode::Clamp:
+		return GetClamped(i, j);
+		break;
+	case TextureAddressMode::Wrap:
+		return GetWrapped(i, j);
+		break;
+	}
 }
 
-glm::vec3 Texture::SampleLinear(const glm::vec2& uv) {
+glm::vec3 Texture::SampleBilinear(const glm::vec2& uv) {
 	// 좌표계 변환
 	glm::vec2 xy = uv * glm::vec2(width, height) - glm::vec2(0.5f);
 
@@ -97,7 +110,12 @@ glm::vec3 Texture::SampleLinear(const glm::vec2& uv) {
 	float dy = xy.y - static_cast<float>(j);
 
 	// bilinear filtering
-	// Wrap 또는 Clamp : bool 변수에 따라 결정되도록 하기
-	// 각 오브젝트마다 IMGUI로 조절하는 것도 좋을 듯
-	return InterpolateBilinear(dx, dy, GetWrapped(i, j), GetWrapped(i + 1, j), GetWrapped(i, j + 1), GetWrapped(i + 1, j + 1));
+	switch (addressMode) {
+	case TextureAddressMode::Clamp:
+		return InterpolateBilinear(dx, dy, GetClamped(i, j), GetClamped(i + 1, j), GetClamped(i, j + 1), GetClamped(i + 1, j + 1));
+		break;
+	case TextureAddressMode::Wrap:
+		return InterpolateBilinear(dx, dy, GetWrapped(i, j), GetWrapped(i + 1, j), GetWrapped(i, j + 1), GetWrapped(i + 1, j + 1));
+		break;
+	}
 }

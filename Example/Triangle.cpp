@@ -2,6 +2,7 @@
 #include "Hit.h"
 #include "Ray.h"
 
+// uv 좌표도 clockwise로 주어져야 함
 Triangle::Triangle(
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
     const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2,

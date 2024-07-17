@@ -33,26 +33,30 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//triangle1->useTexture = false;
 	//objects.push_back(triangle1);
 
-	// 텍스처링 테스트용
-	std::vector<glm::vec3> textureImage(4 * 4);
-	for (int j = 0; j < 4; j++) {
-		for (int i = 0; i < 4; i++) {
-			if (i % 4 == 0)
-				textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
-			else if (i % 4 == 1)
-				textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
-			else if (i % 4 == 2)
-				textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
-			else
-				textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
-		}
-	}
+	//// 텍스처링 테스트용
+	//std::vector<glm::vec3> textureImage(4 * 4);
+	//for (int j = 0; j < 4; j++) {
+	//	for (int i = 0; i < 4; i++) {
+	//		if (i % 4 == 0)
+	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
+	//		else if (i % 4 == 1)
+	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
+	//		else if (i % 4 == 2)
+	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
+	//		else
+	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
+	//	}
+	//}
 
-	auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
+	//auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
+
+	// Image by freepik https://www.freepik.com/free-ai-image/geometric-seamless-pattern_94949548.htm#fromView=search&page=1&position=0&uuid=4bfff6fb-3412-4780-9681-b7f2c31eaa3b
+	auto testTexture = std::make_shared<Texture>("geometric-seamless-pattern.jpg");
+	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
 
 	auto squareTestTexture = std::make_shared<Square>(
 		glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
-		glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f));
+		glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
 	squareTestTexture->material.ambTexture = testTexture;
 	squareTestTexture->material.amb = glm::vec3(1.0f);
 	squareTestTexture->material.dif = glm::vec3(0.0f);
@@ -100,7 +104,8 @@ glm::vec3 RayTracer::traceRay(Ray& ray, const int recurseLevel) {
 		if (hit.obj->material.ambTexture) {
 			// 텍스처에서 샘플링한 값으로 설정
 			// 텍스처 필터링 방식을 변수로 조절할 수 있도록 수정하기
-			phongColor = hit.obj->material.amb * hit.obj->material.ambTexture->SamplePoint(hit.uv);
+			//phongColor = hit.obj->material.amb * hit.obj->material.ambTexture->SamplePoint(hit.uv);
+			phongColor = hit.obj->material.amb * hit.obj->material.ambTexture->SampleBilinear(hit.uv);
 		}
 		else {
 			// material에 지정된 단일 색상으로 설정
@@ -121,7 +126,7 @@ glm::vec3 RayTracer::traceRay(Ray& ray, const int recurseLevel) {
 
 			// diffuse texture가 지정되어 있다면
 			if (hit.obj->material.difTexture) {
-				phongColor += hit.obj->material.dif * diff * hit.obj->material.difTexture->SampleLinear(hit.uv);
+				phongColor += hit.obj->material.dif * diff * hit.obj->material.difTexture->SampleBilinear(hit.uv);
 			}
 			else {
 				phongColor += hit.obj->material.dif * diff;
