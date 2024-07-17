@@ -76,4 +76,9 @@
     <FxCompile Include="VS.hlsl" />
     <FxCompile Include="PS.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="geometric-seamless-pattern.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
