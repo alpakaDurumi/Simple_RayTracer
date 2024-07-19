@@ -25,13 +25,14 @@ public:
 	TextureAddressMode addressMode;
 	TextureFilterMode filterMode;
 
-	// 생성자에서 addressMode와 filterMode를 지정
+	// 생성자에서 addressMode와 filterMode를 지정 가능
 	// 기본값은 각각 Wrap과 Bilinear
 	Texture(const std::string& filename, TextureAddressMode addressMode = TextureAddressMode::Wrap, TextureFilterMode filterMode = TextureFilterMode::Bilinear);
 	Texture(const int& width, const int& height, const std::vector<glm::vec3>& pixels, TextureAddressMode addressMode = TextureAddressMode::Wrap, TextureFilterMode filterMode = TextureFilterMode::Bilinear);
 
 	void SetAddressMode(TextureAddressMode addressMode);
 	void SetFilterMode(TextureFilterMode filterMode);
+	glm::vec3 Sample(const glm::vec2& uv);
 	glm::vec3 GetClamped(int i, int j);
 	glm::vec3 GetWrapped(int i, int j);
 	glm::vec3 InterpolateBilinear(
@@ -41,6 +42,6 @@ public:
 		const glm::vec3& c10,
 		const glm::vec3& c01,
 		const glm::vec3& c11);
-	glm::vec3 SamplePoint(const glm::vec2& uv);
-	glm::vec3 SampleBilinear(const glm::vec2& uv);
+	glm::vec3 FilterNearest(const glm::vec2& samplingPoint);
+	glm::vec3 FilterBilinear(const glm::vec2& samplingPoint);
 };

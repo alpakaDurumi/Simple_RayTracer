@@ -38,6 +38,22 @@ void Texture::SetFilterMode(TextureFilterMode filterMode) {
 	this->filterMode = filterMode;
 }
 
+// 텍스처 샘플링
+glm::vec3 Texture::Sample(const glm::vec2& uv) {
+	// 좌표계 변환
+	// 텍스처 좌표의 범위 uv [0.0, 1.0] x [0.0, 1.0]
+	// 이미지 좌표의 범위 xy [-0.5, width - 1 + 0.5] x [-0.5, height - 1 + 0.5]
+	glm::vec2 samplingPoint = uv * glm::vec2(width, height) - glm::vec2(0.5f);
+
+	// filterMode에 따라 필터링 수행
+	switch (filterMode) {
+	case TextureFilterMode::Point:
+		return FilterNearest(samplingPoint);
+	case TextureFilterMode::Bilinear:
+		return FilterBilinear(samplingPoint);
+	}
+}
+
 // texture addressing mode : Clamp
 glm::vec3 Texture::GetClamped(int i, int j) {
 	i = glm::clamp(i, 0, width - 1);
@@ -75,47 +91,35 @@ glm::vec3 Texture::InterpolateBilinear(
 	return a * (1.0f - dy) + b * dy;
 }
 
-// 텍스처 좌표의 범위 uv [0.0, 1.0] x [0.0, 1.0]
-// 이미지 좌표의 범위 xy [-0.5, width - 1 + 0.5] x [-0.5, height - 1 + 0.5]
-
-// Nearest sampling이라고 부르기도 함
-glm::vec3 Texture::SamplePoint(const glm::vec2& uv)  {
-	// 좌표계 변환
-	glm::vec2 xy = uv * glm::vec2(width, height) - glm::vec2(0.5f);
-
-	// 반올림을 통해 가장 가까운 좌표 계산 : nearest neighbor filtering
-	int i = glm::round(xy.x);
-	int j = glm::round(xy.y);
+// Nearest neighbor filtering
+glm::vec3 Texture::FilterNearest(const glm::vec2& samplingPoint) {
+	// 반올림을 통해 가장 가까운 좌표 계산
+	const int x = glm::round(samplingPoint.x);
+	const int y = glm::round(samplingPoint.y);
 
 	switch (addressMode) {
 	case TextureAddressMode::Clamp:
-		return GetClamped(i, j);
-		break;
+		return GetClamped(x, y);
 	case TextureAddressMode::Wrap:
-		return GetWrapped(i, j);
-		break;
+		return GetWrapped(x, y);
 	}
 }
 
-glm::vec3 Texture::SampleBilinear(const glm::vec2& uv) {
-	// 좌표계 변환
-	glm::vec2 xy = uv * glm::vec2(width, height) - glm::vec2(0.5f);
-
+// Bilinear filtering
+glm::vec3 Texture::FilterBilinear(const glm::vec2& samplingPoint) {
 	// 주변 4개 텍셀 중 좌상단 텍셀의 좌표
-	int i = static_cast<int>(glm::floor(xy.x));
-	int j = static_cast<int>(glm::floor(xy.y));
-	
+	const int topLeftX = static_cast<int>(glm::floor(samplingPoint.x));
+	const int topLeftY = static_cast<int>(glm::floor(samplingPoint.y));
+
 	// interpolation을 위한 간격 값
-	float dx = xy.x - static_cast<float>(i);
-	float dy = xy.y - static_cast<float>(j);
+	float dx = samplingPoint.x - topLeftX;
+	float dy = samplingPoint.y - topLeftY;
 
 	// bilinear filtering
 	switch (addressMode) {
 	case TextureAddressMode::Clamp:
-		return InterpolateBilinear(dx, dy, GetClamped(i, j), GetClamped(i + 1, j), GetClamped(i, j + 1), GetClamped(i + 1, j + 1));
-		break;
+		return InterpolateBilinear(dx, dy, GetClamped(topLeftX, topLeftY), GetClamped(topLeftX + 1, topLeftY), GetClamped(topLeftX, topLeftY + 1), GetClamped(topLeftX + 1, topLeftY + 1));
 	case TextureAddressMode::Wrap:
-		return InterpolateBilinear(dx, dy, GetWrapped(i, j), GetWrapped(i + 1, j), GetWrapped(i, j + 1), GetWrapped(i + 1, j + 1));
-		break;
+		return InterpolateBilinear(dx, dy, GetWrapped(topLeftX, topLeftY), GetWrapped(topLeftX + 1, topLeftY), GetWrapped(topLeftX, topLeftY + 1), GetWrapped(topLeftX + 1, topLeftY + 1));
 	}
 }
