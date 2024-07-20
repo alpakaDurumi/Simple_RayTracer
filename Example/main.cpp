@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include "Renderer.h"
+#include "Texture.h"
+#include "Object.h"
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -85,6 +87,60 @@ int main()
 			ImGui::Begin("Light");
 			ImGui::SliderFloat3("pos", &renderer->rayTracer.light.pos.x, -10.0f, 10.0f);
 			ImGui::End();
+
+			// 각 object에 대해 텍스처 샘플링 설정
+			for (auto& obj : renderer->rayTracer.objects) {
+				if (!obj->material.ambTexture) continue;
+
+				ImGui::Begin("Texture Sampling Settings");
+
+				const char* textureAddressModes[] = { "Clamp", "Wrap" };
+				static const char* current_addressMode = "Clamp";
+				int selectedIndex1 = 0; // 첫 번째 드롭다운 메뉴의 초기 선택 인덱스
+
+				ImGui::SetNextItemWidth(150.0f); // 150픽셀 폭 설정
+				if (ImGui::BeginCombo("texture addressing mode", current_addressMode)) {
+					for (int n = 0; n < IM_ARRAYSIZE(textureAddressModes); n++) {
+						bool is_selected = (current_addressMode == textureAddressModes[n]);
+						if (ImGui::Selectable(textureAddressModes[n], is_selected))
+							current_addressMode = textureAddressModes[n];
+						
+						if (current_addressMode == "Clamp")
+							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Clamp);
+						else if (current_addressMode == "Wrap")
+							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Wrap);
+							
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				const char* textureFilterModes[] = { "Nearest", "Bilinear" };
+				static const char* current_filterMode = "Nearest";
+				int selectedIndex2 = 0; // 두 번째 드롭다운 메뉴의 초기 선택 인덱스
+
+				ImGui::SetNextItemWidth(150.0f); // 150픽셀 폭 설정
+				if (ImGui::BeginCombo("texture filtering mode", current_filterMode)) {
+					for (int n = 0; n < IM_ARRAYSIZE(textureFilterModes); n++) {
+						bool is_selected = (current_filterMode == textureFilterModes[n]);
+						if (ImGui::Selectable(textureFilterModes[n], is_selected))
+							current_filterMode = textureFilterModes[n];
+
+						if (current_filterMode == "Nearest")
+							obj->material.ambTexture->SetFilterMode(TextureFilterMode::Point);
+						else if (current_filterMode == "Bilinear")
+							obj->material.ambTexture->SetFilterMode(TextureFilterMode::Bilinear);
+
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				ImGui::End();
+			}
+
 			ImGui::Render();
 
 			renderer->Update();

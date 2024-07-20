@@ -26,9 +26,9 @@ public:
 	TextureFilterMode filterMode;
 
 	// 생성자에서 addressMode와 filterMode를 지정 가능
-	// 기본값은 각각 Wrap과 Bilinear
-	Texture(const std::string& filename, TextureAddressMode addressMode = TextureAddressMode::Wrap, TextureFilterMode filterMode = TextureFilterMode::Bilinear);
-	Texture(const int& width, const int& height, const std::vector<glm::vec3>& pixels, TextureAddressMode addressMode = TextureAddressMode::Wrap, TextureFilterMode filterMode = TextureFilterMode::Bilinear);
+	// 기본값은 각각 Clamp과 Nearest
+	Texture(const std::string& filename, TextureAddressMode addressMode = TextureAddressMode::Clamp, TextureFilterMode filterMode = TextureFilterMode::Point);
+	Texture(const int& width, const int& height, const std::vector<glm::vec3>& pixels, TextureAddressMode addressMode = TextureAddressMode::Clamp, TextureFilterMode filterMode = TextureFilterMode::Point);
 
 	void SetAddressMode(TextureAddressMode addressMode);
 	void SetFilterMode(TextureFilterMode filterMode);

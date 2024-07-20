@@ -33,27 +33,27 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//triangle1->useTexture = false;
 	//objects.push_back(triangle1);
 
-	//// 텍스처링 테스트용 1
-	//std::vector<glm::vec3> textureImage(4 * 4);
-	//for (int j = 0; j < 4; j++) {
-	//	for (int i = 0; i < 4; i++) {
-	//		if (i % 4 == 0)
-	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
-	//		else if (i % 4 == 1)
-	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
-	//		else if (i % 4 == 2)
-	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
-	//		else
-	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
-	//	}
-	//}
-	//auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
+	// 텍스처링 테스트용 1
+	std::vector<glm::vec3> textureImage(4 * 4);
+	for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < 4; i++) {
+			if (i % 4 == 0)
+				textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
+			else if (i % 4 == 1)
+				textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
+			else if (i % 4 == 2)
+				textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
+			else
+				textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
+		}
+	}
+	auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
 	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
 	//testTexture->SetFilterMode(TextureFilterMode::Point);
 
 	// 텍스처링 테스트용 2
 	//Image by freepik https://www.freepik.com/free-ai-image/geometric-seamless-pattern_94949548.htm#fromView=search&page=1&position=0&uuid=4bfff6fb-3412-4780-9681-b7f2c31eaa3b
-	auto testTexture = std::make_shared<Texture>("geometric-seamless-pattern.jpg");
+	//auto testTexture = std::make_shared<Texture>("geometric-seamless-pattern.jpg");
 	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
 	//testTexture->SetFilterMode(TextureFilterMode::Point);
 
