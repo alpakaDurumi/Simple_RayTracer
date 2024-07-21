@@ -78,6 +78,41 @@ glm::vec3 Texture::GetWrapped(int i, int j) {
 	return glm::vec3(r, g, b);
 }
 
+// texture addressing mode : Mirror
+glm::vec3 Texture::GetMirrored(int i, int j) {
+	int q1 = (i + width) / width;
+	int q2 = (j + height) / height;
+
+	i = (i + width) % width;
+	j = (j + height) % height;
+
+	// ¹ÝÀü
+	if (q1 % 2 == 0)
+		i = width - 1 - i;
+	if (q2 % 2 == 0)
+		j = height - 1 -j;
+
+	const float r = image[(i + width * j) * channels + 0] / 255.0f;
+	const float g = image[(i + width * j) * channels + 1] / 255.0f;
+	const float b = image[(i + width * j) * channels + 2] / 255.0f;
+
+	return glm::vec3(r, g, b);
+}
+
+// texture addressing mode : Border
+glm::vec3 Texture::GetBordered(int i, int j) {
+	glm::vec3 borderColor = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	if (i < 0 || width <= i || j < 0 || height <= j)
+		return borderColor;
+	
+	const float r = image[(i + width * j) * channels + 0] / 255.0f;
+	const float g = image[(i + width * j) * channels + 1] / 255.0f;
+	const float b = image[(i + width * j) * channels + 2] / 255.0f;
+
+	return glm::vec3(r, g, b);
+}
+
 // Bilinear interpolation
 glm::vec3 Texture::InterpolateBilinear(
 	const float& dx,
@@ -102,6 +137,10 @@ glm::vec3 Texture::FilterNearest(const glm::vec2& samplingPoint) {
 		return GetClamped(x, y);
 	case TextureAddressMode::Wrap:
 		return GetWrapped(x, y);
+	case TextureAddressMode::Mirror:
+		return GetMirrored(x, y);
+	case TextureAddressMode::Border:
+		return GetBordered(x, y);
 	}
 }
 
@@ -121,5 +160,9 @@ glm::vec3 Texture::FilterBilinear(const glm::vec2& samplingPoint) {
 		return InterpolateBilinear(dx, dy, GetClamped(topLeftX, topLeftY), GetClamped(topLeftX + 1, topLeftY), GetClamped(topLeftX, topLeftY + 1), GetClamped(topLeftX + 1, topLeftY + 1));
 	case TextureAddressMode::Wrap:
 		return InterpolateBilinear(dx, dy, GetWrapped(topLeftX, topLeftY), GetWrapped(topLeftX + 1, topLeftY), GetWrapped(topLeftX, topLeftY + 1), GetWrapped(topLeftX + 1, topLeftY + 1));
+	case TextureAddressMode::Mirror:
+		return InterpolateBilinear(dx, dy, GetMirrored(topLeftX, topLeftY), GetMirrored(topLeftX + 1, topLeftY), GetMirrored(topLeftX, topLeftY + 1), GetMirrored(topLeftX + 1, topLeftY + 1));
+	case TextureAddressMode::Border:
+		return InterpolateBilinear(dx, dy, GetBordered(topLeftX, topLeftY), GetBordered(topLeftX + 1, topLeftY), GetBordered(topLeftX, topLeftY + 1), GetBordered(topLeftX + 1, topLeftY + 1));
 	}
 }

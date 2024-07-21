@@ -94,7 +94,7 @@ int main()
 
 				ImGui::Begin("Texture Sampling Settings");
 
-				const char* textureAddressModes[] = { "Clamp", "Wrap" };
+				const char* textureAddressModes[] = { "Clamp", "Wrap", "Mirror", "Border"};
 				static const char* current_addressMode = "Clamp";
 				int selectedIndex1 = 0; // 첫 번째 드롭다운 메뉴의 초기 선택 인덱스
 
@@ -109,6 +109,10 @@ int main()
 							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Clamp);
 						else if (current_addressMode == "Wrap")
 							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Wrap);
+						else if (current_addressMode == "Mirror")
+							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Mirror);
+						else if (current_addressMode == "Border")
+							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Border);
 							
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();

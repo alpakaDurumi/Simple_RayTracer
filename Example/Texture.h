@@ -35,6 +35,8 @@ public:
 	glm::vec3 Sample(const glm::vec2& uv);
 	glm::vec3 GetClamped(int i, int j);
 	glm::vec3 GetWrapped(int i, int j);
+	glm::vec3 GetMirrored(int i, int j);
+	glm::vec3 GetBordered(int i, int j);
 	glm::vec3 InterpolateBilinear(
 		const float& dx,
 		const float& dy,
