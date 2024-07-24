@@ -33,5 +33,5 @@ public:
     
     void setColor(const glm::vec3& color);
     void configureSpecular(const float& specularPower, const float& specularCoefficient);
-    virtual Hit CheckRayCollision(Ray& ray) = 0;
+    virtual Hit CheckRayCollision(const Ray& ray) = 0;
 };

@@ -10,7 +10,7 @@ Square::Square(
     const glm::vec3& color)
     : triangle1(v0, v1, v2, uv0, uv1, uv2), triangle2(v0, v2, v3, uv0, uv2, uv3), Object(color) {}
 
-Hit Square::CheckRayCollision(Ray& ray) {
+Hit Square::CheckRayCollision(const Ray& ray) {
     auto hit1 = triangle1.CheckRayCollision(ray);
     auto hit2 = triangle2.CheckRayCollision(ray);
     

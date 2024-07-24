@@ -12,5 +12,5 @@ public:
     float radius;           // 구의 반지름
 
     Sphere(const glm::vec3& center, const float radius, const glm::vec3& color = glm::vec3(1.0f));
-    Hit CheckRayCollision(Ray& ray);
+    Hit CheckRayCollision(const Ray& ray);
 };

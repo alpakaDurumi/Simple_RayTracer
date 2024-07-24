@@ -20,8 +20,9 @@ public:
 	std::vector<std::shared_ptr<Object>> objects;				// 물체 목록
 
 	RayTracer(const int& width, const int& height);
-	Hit FindClosestCollision(Ray& ray);
-	glm::vec3 traceRay(Ray& ray, const int recurseLevel);
+	Hit FindClosestCollision(const Ray& ray);
+	glm::vec3 traceRay(const Ray& ray);
 	void Render(std::vector<glm::vec4>& pixels);
-	glm::vec3 TransformScreenToWorld(glm::vec2 posScreen);
+	glm::vec3 TransformScreenToWorld(const glm::vec2& screenPos);
+	glm::vec3 SuperSample4x(const glm::vec3& cameraPos, const glm::vec3& pixelPos, const float dx);
 };
