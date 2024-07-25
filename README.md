@@ -4,26 +4,44 @@ Personal project about basic RayTracing.
 
 Content is based on lecture : [홍정모의 그래픽스 새싹코스 - 파트 1](https://honglab.co.kr/courses/graphicspt1)
 
-## Main Goals
+## Goals
 
-- Review lecture
-	- Refactor : Separate declaration and definition
-	- Reimplement all features
+### Review lecture
 
-## Additional Goals
+Reimplement all features
+- Draw sphere
+- Transform coordinates	
+- Phong reflection model
+- Perspective projection
+- Draw Triangle
+- Draw Square
+- Shadow
+- Barycentric coordinates/interpolation
+- Texture mapping
+- Supersampling
+- Reflection and Refraction
 
-- Try to implement following stuffs:
-	- Cube mapping
-	- Fresnel effect
-	- Camera rotation
-	- Caustics effect
- 	- Applying Normal map
+### Refactor
+
+- Separate declaration and definition
+- Write code in an object-oriented manner to improve reusability
+
+## Additional Implementaions
+
+Try to implement the following features
+
+- Cube mapping
+- Fresnel effect
+- Camera rotation
+- Caustics effect
+- Applying Normal map
 
 ## What used
 
-- C++
+- C++17
+- OpenMP
 - [GLM](https://github.com/g-truc/glm)
-- DirectX (Not yet studied)
+- DirectX (Not yet studied in depth)
 
 ---
 
@@ -33,23 +51,42 @@ Content is based on lecture : [홍정모의 그래픽스 새싹코스 - 파트 1
 
 내용은 [홍정모의 그래픽스 새싹코스 - 파트 1](https://honglab.co.kr/courses/graphicspt1) 강의를 기반으로 합니다.
 
-## 주 목표
+## 목표
 
-- 강의 복습
-	- 리팩터링 : 선언과 정의를 명확하게 분리
- 	- 모든 기능 재구현
+### 강의 복습
 
-## 추가 목표
+모든 기능 재구현
 
-- 아래 내용 구현 시도
-	- 큐브 매핑
-	- 프레넬(Fresnel) 효과
-	- 카메라 회전
-	- Caustics 효과
- 	- 노멀 맵 적용
+- 구 그리기
+- 좌표계 변환
+- Phong reflection model
+- 원근 투영
+- 삼각형 그리기
+- 사각형 그리기
+- 그림자
+- 질량 중심 좌표계/보간
+- 텍스처 매핑
+- 슈퍼샘플링
+- 반사와 굴절
+
+### 리팩터링
+
+- 선언과 정의를 명확하게 분리
+- 코드의 재사용이 잘 이루어지도록 객체지향적으로 작성하기
+
+### 추가 구현 사항
+
+아래 내용 구현 시도
+
+- 큐브 매핑
+- 프레넬(Fresnel) 효과
+- 카메라 회전
+- Caustics 효과
+- 노멀 맵 적용
 
 ## 사용된 기술
 
-- C++
+- C++17
+- OpenMP
 - [GLM](https://github.com/g-truc/glm)
 - DirectX (아직 자세히 배우지 않음)
