@@ -42,6 +42,7 @@ Try to implement the following features
 - OpenMP
 - [GLM](https://github.com/g-truc/glm)
 - DirectX (Not yet studied in depth)
+- Cube map texture : https://www.humus.name/index.php?page=Textures&ID=95
 
 ---
 
@@ -84,9 +85,10 @@ Try to implement the following features
 - Caustics 효과
 - 노멀 맵 적용
 
-## 사용된 기술
+## 사용된 자료 및 기술
 
 - C++17
 - OpenMP
 - [GLM](https://github.com/g-truc/glm)
 - DirectX (아직 자세히 배우지 않음)
+- 큐브 맵 텍스처 : https://www.humus.name/index.php?page=Textures&ID=95
