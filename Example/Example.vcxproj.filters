@@ -39,6 +39,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VS.hlsl" />
@@ -78,6 +84,24 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="geometric-seamless-pattern.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="negx.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="negy.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="negz.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="posx.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="posy.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="posz.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

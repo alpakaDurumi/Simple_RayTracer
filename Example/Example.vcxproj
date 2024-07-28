@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="RayTracer.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="Hit.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Object.h" />
@@ -176,6 +178,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="geometric-seamless-pattern.jpg" />
+    <Image Include="negx.jpg" />
+    <Image Include="negy.jpg" />
+    <Image Include="negz.jpg" />
+    <Image Include="posx.jpg" />
+    <Image Include="posy.jpg" />
+    <Image Include="posz.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
