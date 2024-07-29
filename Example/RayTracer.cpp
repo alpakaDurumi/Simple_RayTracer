@@ -5,6 +5,7 @@
 #include "Triangle.h"
 #include "Square.h"
 #include "Texture.h"
+#include "CubeMap.h"
 
 RayTracer::RayTracer(const int& width, const int& height)
 	: width(width), height(height) {
@@ -12,26 +13,20 @@ RayTracer::RayTracer(const int& width, const int& height)
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
 	// 초록색 구
-	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
-	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	sphere1->configureSpecular(40.0f, 1.0f);
-	objects.push_back(sphere1);
+	//auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
+	//sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
+	//sphere1->configureSpecular(40.0f, 1.0f);
+	//objects.push_back(sphere1);
 
-	//// 보라색 구
+	// 보라색 구
 	//auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
 	//sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
 	//sphere2->configureSpecular(40.0f, 1.0f);
 	//objects.push_back(sphere2);
 
 	// 흰색 사각형
-	auto square1 = std::make_shared<Square>(glm::vec3(-4.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 0.0f));
-	objects.push_back(square1);
-	
-	//// 삼각형
-	//auto triangle1 = std::make_shared<Triangle>(glm::vec3(-3.0f, -3.0f, 4.0f), glm::vec3(-3.0f, 3.0f, 4.0f), glm::vec3(3.0f, -3.0f, 4.0f));
-	//triangle1->configureSpecular(0.0f, 0.0f);
-	//triangle1->useTexture = false;
-	//objects.push_back(triangle1);
+	//auto square1 = std::make_shared<Square>(glm::vec3(-4.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 0.0f));
+	//objects.push_back(square1);
 
 	// 텍스처링 테스트용 1
 	std::vector<glm::vec3> textureImage(4 * 4);
@@ -48,8 +43,8 @@ RayTracer::RayTracer(const int& width, const int& height)
 		}
 	}
 	auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
-	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
-	//testTexture->SetFilterMode(TextureFilterMode::Point);
+	testTexture->SetAddressMode(TextureAddressMode::Clamp);
+	testTexture->SetFilterMode(TextureFilterMode::Point);
 
 	// 텍스처링 테스트용 2
 	//Image by freepik https://www.freepik.com/free-ai-image/geometric-seamless-pattern_94949548.htm#fromView=search&page=1&position=0&uuid=4bfff6fb-3412-4780-9681-b7f2c31eaa3b
@@ -57,14 +52,22 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
 	//testTexture->SetFilterMode(TextureFilterMode::Point);
 
-	auto squareTestTexture = std::make_shared<Square>(
+	auto squareTest = std::make_shared<Square>(
 		glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
 		glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
-	squareTestTexture->material.ambTexture = testTexture;
-	squareTestTexture->material.amb = glm::vec3(1.0f);
-	squareTestTexture->material.dif = glm::vec3(0.0f);
-	squareTestTexture->configureSpecular(0.0f, 0.0f);
-	//objects.push_back(squareTestTexture);
+	//squareTest->setTexture(testTexture);
+	squareTest->material->ambTexture = testTexture;
+	squareTest->material->amb = glm::vec3(1.0f);
+	squareTest->material->dif = glm::vec3(0.0f);
+	squareTest->configureSpecular(0.0f, 0.0f);
+	objects.push_back(squareTest);
+
+	// 큐브맵 테스트
+	//std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
+	//auto skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
+	//skyBox->material.amb = glm::vec3(0.2f);
+	//skyBox->material.dif = glm::vec3(0.0f);
+	//objects.push_back(skyBox);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
@@ -80,7 +83,9 @@ Hit RayTracer::FindClosestCollision(const Ray& ray) {
 			if (hit.d < closestDistance) {
 				closestDistance = hit.d;
 				closestHit = hit;
-				closestHit.obj = objects[i];		// 물체의 머티리얼 정보
+				//closestHit.obj = objects[i];		// 물체의 머티리얼 정보
+				// 여기서 큐브맵의 경우, 큐브맵 클래스 자체의 머터리얼을 지정하게 되어서 아무것도 없는 기본 머터리얼이 되어 회색이 나오게 되는것임
+				// objects[i]가 큐브맵일 경우 특수하게 처리하는 것이 필요
 			}
 		}
 	}
@@ -101,13 +106,13 @@ glm::vec3 RayTracer::traceRay(const Ray& ray) {
 		glm::vec3 phongColor;
 
 		// ambient texture가 지정되어 있다면
-		if (hit.obj->material.ambTexture) {
+		if (hit.material->ambTexture) {
 			// 텍스처에서 샘플링한 값으로 설정
-			phongColor = hit.obj->material.amb * hit.obj->material.ambTexture->Sample(hit.uv);
+			phongColor = hit.material->amb * hit.material->ambTexture->Sample(hit.uv);
 		}
 		else {
 			// material에 지정된 단일 색상으로 설정
-			phongColor = hit.obj->material.amb;
+			phongColor = hit.material->amb;
 		}
 
 		const glm::vec3 dirToLight = glm::normalize(light.pos - hit.point);
@@ -123,22 +128,22 @@ glm::vec3 RayTracer::traceRay(const Ray& ray) {
 			const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
 
 			// diffuse texture가 지정되어 있다면
-			if (hit.obj->material.difTexture) {
-				phongColor += hit.obj->material.dif * diff * hit.obj->material.difTexture->Sample(hit.uv);
+			if (hit.material->difTexture) {
+				phongColor += hit.material->dif * diff * hit.material->difTexture->Sample(hit.uv);
 			}
 			else {
-				phongColor += hit.obj->material.dif * diff;
+				phongColor += hit.material->dif * diff;
 			}
 
 			// Specular 계산
 			const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, hit.normal) * hit.normal - dirToLight;
-			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.obj->material.specularPower);
+			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.material->specularPower);
 
 			// specular texture는 사용 X
-			phongColor += hit.obj->material.spec * specular * hit.obj->material.specularCoefficient;
+			phongColor += hit.material->spec * specular * hit.material->specularCoefficient;
 		}
 
-		objectColor += phongColor * (1.0f - hit.obj->material.reflection - hit.obj->material.transparency);
+		objectColor += phongColor * (1.0f - hit.material->reflection - hit.material->transparency);
 
 		return objectColor;
 	}

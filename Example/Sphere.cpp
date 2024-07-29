@@ -26,7 +26,9 @@ Hit Sphere::CheckRayCollision(const Ray& ray) {
         hit.point = ray.start + ray.dir * hit.d;
         hit.normal = glm::normalize(hit.point - center);
         // hit.uv는 Sphere에 대해서는 따로 지정하지 않음
-        // hit.obj도 여기서 지정하고 싶지만, std::shared_ptr은 따로 this같은 키워드가 없기 때문에 RayTracer에서 지정
+        
+        // material 지정
+        hit.material = material;
     }
 
     return hit;

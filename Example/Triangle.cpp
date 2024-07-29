@@ -68,5 +68,8 @@ void Triangle::IntersectRayTriangle(const Ray& ray, Hit& hit) {
         const float w = 1.0f - u - v;
 
         hit.uv = uv0 * u + uv1 * v + uv2 * w;
+
+        // material ÁöÁ¤
+        hit.material = material;
     }
 }

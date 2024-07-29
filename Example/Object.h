@@ -27,9 +27,10 @@ struct Material {
 class Object
 {
 public:
-    Material material;
+    std::shared_ptr<Material> material;
 
     Object(const glm::vec3& color = { 1.0f, 1.0f, 1.0f });
+    Object(const std::shared_ptr<Material>& mat);
     
     void setColor(const glm::vec3& color);
     void configureSpecular(const float& specularPower, const float& specularCoefficient);

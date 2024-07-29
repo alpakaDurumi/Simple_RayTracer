@@ -8,7 +8,6 @@
 #include "Light.h"
 
 class Hit;
-class Light;
 class Object;
 class Ray;
 

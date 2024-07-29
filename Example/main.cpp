@@ -90,7 +90,7 @@ int main()
 
 			// 각 object에 대해 텍스처 샘플링 설정
 			for (auto& obj : renderer->rayTracer.objects) {
-				if (!obj->material.ambTexture) continue;
+				if (!obj->material->ambTexture) continue;
 
 				ImGui::Begin("Texture Sampling Settings");
 
@@ -106,13 +106,13 @@ int main()
 							current_addressMode = textureAddressModes[n];
 						
 						if (current_addressMode == "Clamp")
-							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Clamp);
+							obj->material->ambTexture->SetAddressMode(TextureAddressMode::Clamp);
 						else if (current_addressMode == "Wrap")
-							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Wrap);
+							obj->material->ambTexture->SetAddressMode(TextureAddressMode::Wrap);
 						else if (current_addressMode == "Mirror")
-							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Mirror);
+							obj->material->ambTexture->SetAddressMode(TextureAddressMode::Mirror);
 						else if (current_addressMode == "Border")
-							obj->material.ambTexture->SetAddressMode(TextureAddressMode::Border);
+							obj->material->ambTexture->SetAddressMode(TextureAddressMode::Border);
 							
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
@@ -132,9 +132,9 @@ int main()
 							current_filterMode = textureFilterModes[n];
 
 						if (current_filterMode == "Nearest")
-							obj->material.ambTexture->SetFilterMode(TextureFilterMode::Point);
+							obj->material->ambTexture->SetFilterMode(TextureFilterMode::Point);
 						else if (current_filterMode == "Bilinear")
-							obj->material.ambTexture->SetFilterMode(TextureFilterMode::Bilinear);
+							obj->material->ambTexture->SetFilterMode(TextureFilterMode::Bilinear);
 
 						if (is_selected)
 							ImGui::SetItemDefaultFocus();
