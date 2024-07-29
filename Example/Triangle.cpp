@@ -6,8 +6,8 @@
 Triangle::Triangle(
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
     const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2,
-    const glm::vec3& color)
-    : v0(v0), v1(v1), v2(v2), uv0(uv0), uv1(uv1), uv2(uv2), Object(color) {}
+    const std::shared_ptr<Material>& mat)
+    : v0(v0), v1(v1), v2(v2), uv0(uv0), uv1(uv1), uv2(uv2), Object(mat) {}
 
 Hit Triangle::CheckRayCollision(const Ray& ray) {
     Hit hit = Hit{ -1.0, glm::vec3(0.0), glm::vec3(0.0) };

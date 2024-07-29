@@ -11,6 +11,7 @@ public:
     glm::vec3 center;       // 구의 중심 좌표
     float radius;           // 구의 반지름
 
-    Sphere(const glm::vec3& center, const float radius, const glm::vec3& color = glm::vec3(1.0f));
+    Sphere(const glm::vec3& center, const float radius, const std::shared_ptr<Material>& mat = nullptr);
+
     Hit CheckRayCollision(const Ray& ray);
 };

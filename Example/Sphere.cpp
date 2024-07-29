@@ -2,8 +2,8 @@
 #include "Hit.h"
 #include "Ray.h"
 
-Sphere::Sphere(const glm::vec3& center, const float radius, const glm::vec3& color)
-    : center(center), radius(radius), Object(color) {}
+Sphere::Sphere(const glm::vec3& center, const float radius, const std::shared_ptr<Material>& mat)
+    : center(center), radius(radius), Object(mat) {}
 
 Hit Sphere::CheckRayCollision(const Ray& ray) {
     Hit hit = Hit{ -1.0f, glm::vec3(0.0f), glm::vec3(0.0f) };
@@ -27,7 +27,7 @@ Hit Sphere::CheckRayCollision(const Ray& ray) {
         hit.normal = glm::normalize(hit.point - center);
         // hit.uv는 Sphere에 대해서는 따로 지정하지 않음
         
-        // material 지정
+        // 머티리얼 지정
         hit.material = material;
     }
 

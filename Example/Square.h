@@ -13,6 +13,6 @@ public:
     Square(
         const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3,
         const glm::vec2& uv0 = glm::vec2(0.0f), const glm::vec2& uv1 = glm::vec2(1.0f, 0.0f), const glm::vec2& uv2 = glm::vec2(1.0f), const glm::vec2& uv3 = glm::vec2(0.0f, 1.0f),
-        const glm::vec3& color = glm::vec3(1.0f));
+        const std::shared_ptr<Material>& mat = nullptr);
     virtual Hit CheckRayCollision(const Ray& ray);
 };

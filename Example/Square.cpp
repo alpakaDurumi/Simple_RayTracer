@@ -7,8 +7,8 @@
 Square::Square(
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3,
     const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2, const glm::vec2& uv3,
-    const glm::vec3& color)
-    : triangle1(v0, v1, v2, uv0, uv1, uv2), triangle2(v0, v2, v3, uv0, uv2, uv3), Object(color) {}
+    const std::shared_ptr<Material>& mat)
+    : triangle1(v0, v1, v2, uv0, uv1, uv2, mat), triangle2(v0, v2, v3, uv0, uv2, uv3, mat) {}
 
 Hit Square::CheckRayCollision(const Ray& ray) {
     auto hit1 = triangle1.CheckRayCollision(ray);
