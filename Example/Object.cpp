@@ -8,13 +8,23 @@ Object::Object(const std::shared_ptr<Material>& mat) {
         material = std::make_shared<Material>();
 }
 
-// 주어진 색상 값으로 ambient, diffuse 값을 결정
-// 필요 시 ambientFactor 값 조절
-// specular는 1.0f로 설정
+// 머티리얼의 색상을 지정하는 함수
 void Object::setColor(const glm::vec3& color) {
-    float ambientFactor = 0.2f;
-    material->amb = color * ambientFactor;
-    material->dif = color * (1.0f - ambientFactor);
+    material->baseColor = color;
+    updatePhong();
+}
+
+// ambient와 diffuse 값의 비율을 조절하는 함수
+void Object::setAmbientFactor(const float& ambientFactor) {
+    material->ambientFactor = ambientFactor;
+    updatePhong();
+}
+
+// 위 두 함수에서 수정하는 값을 토대로 phong reflection model의 각 색상 값을 다시 설정하는 함수
+// specular는 일단 1.0f로 고정
+void Object::updatePhong() {
+    material->amb = material->baseColor * material->ambientFactor;
+    material->dif = material->baseColor * (1.0f - material->ambientFactor);
     material->spec = glm::vec3(1.0f);
 }
 

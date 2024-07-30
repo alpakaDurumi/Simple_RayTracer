@@ -15,13 +15,11 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// 초록색 구
 	//auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
 	//sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	//sphere1->configureSpecular(40.0f, 1.0f);
 	//objects.push_back(sphere1);
 
 	// 보라색 구
 	//auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
 	//sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
-	//sphere2->configureSpecular(40.0f, 1.0f);
 	//objects.push_back(sphere2);
 
 	// 흰색 사각형
@@ -55,11 +53,9 @@ RayTracer::RayTracer(const int& width, const int& height)
 	auto squareTest = std::make_shared<Square>(
 		glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
 		glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
-	//squareTest->setTexture(testTexture);
-	squareTest->material->ambTexture = testTexture;
-	squareTest->material->amb = glm::vec3(1.0f);
-	squareTest->material->dif = glm::vec3(0.0f);
+	squareTest->setTexture(testTexture);
 	squareTest->configureSpecular(0.0f, 0.0f);
+	squareTest->setAmbientFactor(1.0f);
 	objects.push_back(squareTest);
 
 	// 큐브맵 테스트

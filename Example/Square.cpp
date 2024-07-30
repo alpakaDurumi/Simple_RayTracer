@@ -25,14 +25,10 @@ Hit Square::CheckRayCollision(const Ray& ray) {
         return hit2;
 }
 
-// 멤버인 각 Triangle 객체의 텍스처를 지정하는 함수
+// 텍스처 지정 함수
 void Square::setTexture(const std::shared_ptr<Texture>& ambTexture, const std::shared_ptr<Texture>& difTexture) {
-    if (ambTexture) {
-        triangle1.material->ambTexture = ambTexture;
-        triangle2.material->ambTexture = ambTexture;
-    }
-    if (difTexture) {
-        triangle1.material->difTexture = difTexture;
-        triangle2.material->difTexture = difTexture;
-    }
+    if (ambTexture)
+        material->ambTexture = ambTexture;
+    if (difTexture)
+        material->difTexture = difTexture;
 }
