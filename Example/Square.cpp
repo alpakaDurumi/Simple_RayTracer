@@ -8,7 +8,7 @@ Square::Square(
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3,
     const glm::vec2& uv0, const glm::vec2& uv1, const glm::vec2& uv2, const glm::vec2& uv3,
     const std::shared_ptr<Material>& mat)
-    : triangle1(v0, v1, v2, uv0, uv1, uv2, mat), triangle2(v0, v2, v3, uv0, uv2, uv3, mat) {}
+    : Object(mat), triangle1(v0, v1, v2, uv0, uv1, uv2, material), triangle2(v0, v2, v3, uv0, uv2, uv3, material) {}
 
 Hit Square::CheckRayCollision(const Ray& ray) {
     auto hit1 = triangle1.CheckRayCollision(ray);
@@ -23,4 +23,16 @@ Hit Square::CheckRayCollision(const Ray& ray) {
         return hit1;
     else
         return hit2;
+}
+
+// 멤버인 각 Triangle 객체의 텍스처를 지정하는 함수
+void Square::setTexture(const std::shared_ptr<Texture>& ambTexture, const std::shared_ptr<Texture>& difTexture) {
+    if (ambTexture) {
+        triangle1.material->ambTexture = ambTexture;
+        triangle2.material->ambTexture = ambTexture;
+    }
+    if (difTexture) {
+        triangle1.material->difTexture = difTexture;
+        triangle2.material->difTexture = difTexture;
+    }
 }
