@@ -27,22 +27,22 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//objects.push_back(square1);
 
 	// 텍스처링 테스트용 1
-	std::vector<glm::vec3> textureImage(4 * 4);
-	for (int j = 0; j < 4; j++) {
-		for (int i = 0; i < 4; i++) {
-			if (i % 4 == 0)
-				textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
-			else if (i % 4 == 1)
-				textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
-			else if (i % 4 == 2)
-				textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
-			else
-				textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
-		}
-	}
-	auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
-	testTexture->SetAddressMode(TextureAddressMode::Clamp);
-	testTexture->SetFilterMode(TextureFilterMode::Point);
+	//std::vector<glm::vec3> textureImage(4 * 4);
+	//for (int j = 0; j < 4; j++) {
+	//	for (int i = 0; i < 4; i++) {
+	//		if (i % 4 == 0)
+	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
+	//		else if (i % 4 == 1)
+	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
+	//		else if (i % 4 == 2)
+	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
+	//		else
+	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
+	//	}
+	//}
+	//auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
+	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
+	//testTexture->SetFilterMode(TextureFilterMode::Point);
 
 	// 텍스처링 테스트용 2
 	//Image by freepik https://www.freepik.com/free-ai-image/geometric-seamless-pattern_94949548.htm#fromView=search&page=1&position=0&uuid=4bfff6fb-3412-4780-9681-b7f2c31eaa3b
@@ -50,20 +50,18 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
 	//testTexture->SetFilterMode(TextureFilterMode::Point);
 
-	auto squareTest = std::make_shared<Square>(
-		glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
-		glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
-	squareTest->setTexture(testTexture);
-	squareTest->configureSpecular(0.0f, 0.0f);
-	squareTest->setAmbientFactor(1.0f);
-	objects.push_back(squareTest);
+	//auto squareTest = std::make_shared<Square>(
+	//	glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
+	//	glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
+	//squareTest->setTexture(testTexture);
+	//squareTest->configureSpecular(0.0f, 0.0f);
+	//squareTest->setAmbientFactor(1.0f);
+	//objects.push_back(squareTest);
 
 	// 큐브맵 테스트
-	//std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
-	//auto skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
-	//skyBox->material.amb = glm::vec3(0.2f);
-	//skyBox->material.dif = glm::vec3(0.0f);
-	//objects.push_back(skyBox);
+	std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
+	auto skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles, glm::vec3(0.0f, 0.0f, 10.0f), 10.0f);
+	objects.push_back(skyBox);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
@@ -79,9 +77,6 @@ Hit RayTracer::FindClosestCollision(const Ray& ray) {
 			if (hit.d < closestDistance) {
 				closestDistance = hit.d;
 				closestHit = hit;
-				//closestHit.obj = objects[i];		// 물체의 머티리얼 정보
-				// 여기서 큐브맵의 경우, 큐브맵 클래스 자체의 머터리얼을 지정하게 되어서 아무것도 없는 기본 머터리얼이 되어 회색이 나오게 되는것임
-				// objects[i]가 큐브맵일 경우 특수하게 처리하는 것이 필요
 			}
 		}
 	}

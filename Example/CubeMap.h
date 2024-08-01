@@ -18,11 +18,12 @@ const std::array<glm::vec3, 8> cubeVertices = { {
 	{ -1.0f,  1.0f,  1.0f }  // v7 : ¿ÞÂÊ À§ ¾Õ
 } };
 
-class CubeMap {
+class CubeMap : public Object {
 public:
-	CubeMap(const std::array<std::string, 6>& textureFiles, const glm::vec3& center = glm::vec3(0.0f));
-
 	glm::vec3 center;
 	float size = 10.0f;
 	std::vector<Square> faces;
+
+	CubeMap(const std::array<std::string, 6>& textureFiles, const glm::vec3& center = glm::vec3(0.0f), const float& size = 10.0f);
+	virtual Hit CheckRayCollision(const Ray& ray);
 };
