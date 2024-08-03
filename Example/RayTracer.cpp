@@ -13,9 +13,10 @@ RayTracer::RayTracer(const int& width, const int& height)
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
 	// 초록색 구
-	//auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
-	//sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	//objects.push_back(sphere1);
+	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
+	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
+	sphere1->material->reflection = 0.5f;
+	objects.push_back(sphere1);
 
 	// 보라색 구
 	//auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
@@ -84,7 +85,10 @@ Hit RayTracer::FindClosestCollision(const Ray& ray) {
 }
 
 // 광선이 물체에 닿으면 그 물체의 색 반환
-glm::vec3 RayTracer::traceRay(const Ray& ray) {
+glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
+	if (recurseLevel < 0)
+		return glm::vec3(0.0f);
+
 	// 가장 가까운 충돌에 대한 Hit
 	const auto hit = FindClosestCollision(ray);
 
@@ -135,6 +139,13 @@ glm::vec3 RayTracer::traceRay(const Ray& ray) {
 
 		objectColor += phongColor * (1.0f - hit.material->reflection - hit.material->transparency);
 
+		// reflection이 설정되어 있다면
+		if (hit.material->reflection > 0.0f) {
+			const glm::vec3 reflectedDir = 2.0f * dot(hit.normal, -ray.dir) * hit.normal + ray.dir;
+			Ray reflectionRay{ hit.point + reflectedDir * 1e-4f, reflectedDir };
+			objectColor += traceRay(reflectionRay, recurseLevel - 1) * hit.material->reflection;
+		}
+
 		return objectColor;
 	}
 
@@ -162,7 +173,7 @@ void RayTracer::Render(std::vector<glm::vec4>& pixels) {
 
 			// ray를 픽셀 당 하나만 쏘는 코드
 			Ray pixelRay{ pixelPosWorld, glm::normalize(pixelPosWorld - cameraPos) };
-			pixels[i + width * j] = glm::vec4(glm::clamp(traceRay(pixelRay), 0.0f, 1.0f), 1.0f);
+			pixels[i + width * j] = glm::vec4(glm::clamp(traceRay(pixelRay, 5), 0.0f, 1.0f), 1.0f);
 
 			// ray를 여러개 쏴서 슈퍼샘플링하는 코드
 			//const auto pixelColor = SuperSample4x(cameraPos, pixelPosWorld, dx);
@@ -193,7 +204,7 @@ glm::vec3 RayTracer::SuperSample4x(const glm::vec3& cameraPos, const glm::vec3& 
 	for(int i = 0; i < 4; i++) {
 		glm::vec3 subPos(pixelPos.x + hor[i] * subdx, pixelPos.y + ver[i] * subdx, pixelPos.z);
 		Ray subRay{ subPos, glm::normalize(subPos - cameraPos) };
-		pixelColor += traceRay(subRay);
+		pixelColor += traceRay(subRay, 5);
 	}
 
 	// 평균을 내서 반환
