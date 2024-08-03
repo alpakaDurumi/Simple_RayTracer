@@ -4,11 +4,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-class Object;           // 전방 선언
-//#include "Object.h"   // Material을 알려면 필요하지 않을까?
+// 전방 선언
+class Object;           
+struct Material;
 
-class Hit
-{
+class Hit {
 public:
     float d;            // Ray의 시작 지점부터 충돌 지점까지의 거리
     glm::vec3 point;    // 충돌한 위치

@@ -58,10 +58,9 @@ RayTracer::RayTracer(const int& width, const int& height)
 	//squareTest->setAmbientFactor(1.0f);
 	//objects.push_back(squareTest);
 
-	// 큐브맵 테스트
+	// 큐브맵
 	std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
-	auto skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles, glm::vec3(0.0f, 0.0f, 10.0f), 10.0f);
-	objects.push_back(skyBox);
+	skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
@@ -138,6 +137,10 @@ glm::vec3 RayTracer::traceRay(const Ray& ray) {
 
 		return objectColor;
 	}
+
+	// 물체에 부딪히지 않았고, 스카이박스가 존재한다면 스카이박스 샘플링
+	if (skyBox)
+		return skyBox->sampleColor(ray);
 
 	return glm::vec3(0.0f);
 }

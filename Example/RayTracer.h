@@ -10,6 +10,7 @@
 class Hit;
 class Object;
 class Ray;
+class CubeMap;
 
 class RayTracer
 {
@@ -17,6 +18,7 @@ public:
 	int width, height;											// 해상도
 	Light light;												// 광원
 	std::vector<std::shared_ptr<Object>> objects;				// 물체 목록
+	std::shared_ptr<CubeMap> skyBox;
 
 	RayTracer(const int& width, const int& height);
 	Hit FindClosestCollision(const Ray& ray);
