@@ -15,13 +15,14 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// 초록색 구
 	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
 	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	sphere1->material->reflection = 0.5f;
+	sphere1->material->refraction = 0.5f;
 	objects.push_back(sphere1);
 
 	// 보라색 구
-	//auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
-	//sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
-	//objects.push_back(sphere2);
+	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
+	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
+	sphere2->material->reflection = 0.5f;
+	objects.push_back(sphere2);
 
 	// 흰색 사각형
 	//auto square1 = std::make_shared<Square>(glm::vec3(-4.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 0.0f));
@@ -137,13 +138,45 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			phongColor += hit.material->spec * specular * hit.material->specularCoefficient;
 		}
 
-		objectColor += phongColor * (1.0f - hit.material->reflection - hit.material->transparency);
+		objectColor += phongColor * (1.0f - hit.material->reflection - hit.material->refraction);
 
 		// reflection이 설정되어 있다면
 		if (hit.material->reflection > 0.0f) {
 			const glm::vec3 reflectedDir = 2.0f * dot(hit.normal, -ray.dir) * hit.normal + ray.dir;
 			Ray reflectionRay{ hit.point + reflectedDir * 1e-4f, reflectedDir };
 			objectColor += traceRay(reflectionRay, recurseLevel - 1) * hit.material->reflection;
+		}
+
+		// transparency가 설정되어 있다면
+		if (hit.material->refraction > 0.0f) {
+			// 물체의 밖에서 안으로 굴절되는 경우의 값
+			float relativeRefractiveIndex = 1.5f;
+			glm::vec3 normal = hit.normal;
+
+			// 물체의 안에서 밖으로 굴절되는 경우, 위 두 값을 반대로 설정
+			if (glm::dot(ray.dir, hit.normal) >= 0.0f) {
+				relativeRefractiveIndex = 1.0f / relativeRefractiveIndex;
+				normal = -normal;
+			}
+
+			// 입사각
+			const float cosThetaIn = glm::dot(-ray.dir, normal);
+			const float sinThetaIn = glm::sqrt(1.0f - cosThetaIn * cosThetaIn);
+
+			// 굴절각
+			const float sinThetaRef = sinThetaIn / relativeRefractiveIndex;
+			const float cosThetaRef = glm::sqrt(1.0f - sinThetaRef * sinThetaRef);
+
+			// 굴절 방향의 x 성분(방향 * 크기)
+			const glm::vec3 x = glm::normalize(cosThetaIn * normal + ray.dir) * sinThetaRef;
+			// 굴절 방향의 y 성분(방향 * 크기)
+			const glm::vec3 y = -normal * cosThetaRef;
+
+			// 굴절 방향
+			const glm::vec3 refractedDir = glm::normalize(x + y);
+
+			Ray refractionRay{ hit.point + refractedDir * 1e-4f, refractedDir };
+			objectColor += traceRay(refractionRay, recurseLevel) * hit.material->refraction;
 		}
 
 		return objectColor;
