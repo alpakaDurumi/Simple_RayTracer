@@ -13,5 +13,5 @@ public:
 
     Sphere(const glm::vec3& center, const float radius, const std::shared_ptr<Material>& mat = nullptr);
 
-    Hit CheckRayCollision(const Ray& ray);
+    Hit CheckRayCollision(const Ray& ray) override;
 };

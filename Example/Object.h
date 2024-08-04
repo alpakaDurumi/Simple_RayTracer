@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-// 전방 선언
 class Hit;
 class Ray;
 class Texture;

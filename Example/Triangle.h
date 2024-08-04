@@ -19,6 +19,7 @@ public:
         const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
         const glm::vec2& uv0 = glm::vec2(0.0f), const glm::vec2& uv1 = glm::vec2(0.0f), const glm::vec2& uv2 = glm::vec2(0.0f),
         const std::shared_ptr<Material>& mat = nullptr);
-    virtual Hit CheckRayCollision(const Ray& ray);
+
+    Hit CheckRayCollision(const Ray& ray) override;
     void IntersectRayTriangle(const Ray& ray, Hit& hit);
 };
