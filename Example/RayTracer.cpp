@@ -8,18 +8,17 @@
 #include "CubeMap.h"
 
 RayTracer::RayTracer(const int& width, const int& height)
-	: width(width), height(height) {
+	: width(width), height(height), camera(width, height) {
 	// -z 방향에 광원
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
 	// 초록색 구
-	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 1.0f), 0.5f);
-	sphere1->setColor(glm::vec3{ 0.0f, 1.0f, 0.0f });
-	sphere1->material->refraction = 0.5f;
+	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 0.5f);
+	sphere1->material->refraction = 1.0f;
 	objects.push_back(sphere1);
 
 	// 보라색 구
-	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 1.0f), 0.5f);
+	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 2.0f), 0.5f);
 	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
 	sphere2->material->reflection = 0.5f;
 	objects.push_back(sphere2);
@@ -147,7 +146,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			objectColor += traceRay(reflectionRay, recurseLevel - 1) * hit.material->reflection;
 		}
 
-		// transparency가 설정되어 있다면
+		// refraction이 설정되어 있다면
 		if (hit.material->refraction > 0.0f) {
 			// 물체의 밖에서 안으로 굴절되는 경우의 값
 			float relativeRefractiveIndex = 1.5f;
@@ -193,8 +192,6 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 void RayTracer::Render(std::vector<glm::vec4>& pixels) {
 	std::fill(pixels.begin(), pixels.end(), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	const glm::vec3 cameraPos(0.0f, 0.0f, -1.5f);
-
 	// 픽셀의 크기
 	const float dx = 2.0f / height;
 
@@ -205,24 +202,30 @@ void RayTracer::Render(std::vector<glm::vec4>& pixels) {
 			// For perspective projection
 
 			// ray를 픽셀 당 하나만 쏘는 코드
-			Ray pixelRay{ pixelPosWorld, glm::normalize(pixelPosWorld - cameraPos) };
+			Ray pixelRay{ pixelPosWorld, glm::normalize(pixelPosWorld - camera.position) };
 			pixels[i + width * j] = glm::vec4(glm::clamp(traceRay(pixelRay, 5), 0.0f, 1.0f), 1.0f);
 
 			// ray를 여러개 쏴서 슈퍼샘플링하는 코드
-			//const auto pixelColor = SuperSample4x(cameraPos, pixelPosWorld, dx);
+			//const auto pixelColor = SuperSample4x(camera.position, pixelPosWorld, dx);
 			//pixels[i + width * j] = glm::vec4(glm::clamp(pixelColor, 0.0f, 1.0f), 1.0f);
 		}
 }
 
 // 스크린 좌표계 -> 월드 좌표계 변환
-// 대상 월드 좌표계의 범위는 [-aspect, aspect] * [1, -1]
-// 픽셀의 중심이 가장자리와 화면의 가장자리가 일치하는 구조 사용
 glm::vec3 RayTracer::TransformScreenToWorld(const glm::vec2& screenPos) {
-	const float xScale = 2.0f / this->width;
-	const float yScale = 2.0f / this->height;
-	const float aspect = static_cast<float>(this->width) / this->height;
+	// NDC 좌표로 변환
+	// 픽셀 중심 좌표를 고려하여 0.5 오프셋 추가
+	const float ndcX = 2.0f * (screenPos.x + 0.5f) / camera.width - 1.0f;
+	const float ndcY = 1.0f - 2.0f * (screenPos.y + 0.5f) / camera.height;
 
-	return glm::vec3(((screenPos.x + 0.5f) * xScale - 1.0f) * aspect, -(screenPos.y + 0.5f) * yScale + 1.0f, 0.0f);
+	// 월드 좌표로 변환
+	// fov는 각도로 주어지기 때문에 라디안으로의 변환이 필요
+	const float worldX = ndcX * camera.aspectRatio * tan(glm::radians(camera.fov / 2.0f));
+	const float worldY = ndcY * tan(glm::radians(camera.fov / 2.0f));
+
+	// z좌표는 임시로 1.0f로 고정
+	glm::vec3 worldPos = glm::vec3(worldX, worldY, 1.0f);
+	return worldPos;
 }
 
 // 한 픽셀에 대해 4배로 슈퍼샘플링
