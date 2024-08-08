@@ -14,9 +14,14 @@ class CubeMap;
 
 struct Camera {
 	glm::vec3 position	{ 0.0f, 0.0f, 0.0f };
-	glm::vec3 front		{ 0.0f, 0.0f, 1.0f };
-	glm::vec3 up		{ 0.0f, 1.0f, 0.0f };
-	glm::vec3 right		{ 1.0f, 0.0f, 0.0f };
+
+	// 기준 방향 벡터
+	glm::vec3 forward	{ 0.0f, 0.0f, 1.0f };	// +z
+	glm::vec3 right		{ 1.0f, 0.0f, 0.0f };	// +x
+	glm::vec3 up		{ 0.0f, 1.0f, 0.0f };	// +y
+
+	glm::mat4 viewMatrix = glm::mat4(1.0f);
+
 	float fov = 90.0f;		// 시야각
 	int width;				// 가로 해상도
 	int height;				// 세로 해상도
@@ -25,6 +30,13 @@ struct Camera {
 	Camera(const int& width, const int& height)
 		: width(width), height(height) {
 		aspectRatio = static_cast<float>(width) / height;
+	}
+
+	// 회전 행렬 업데이트 함수
+	// 글로벌 회전으로 구현
+	void updateViewMatrix(const float& deltaYaw, const float& deltaPitch) {
+		viewMatrix = glm::rotate(viewMatrix, glm::radians(deltaYaw), glm::vec3(0.0f, 1.0f, 0.0f));
+		viewMatrix = glm::rotate(viewMatrix, glm::radians(deltaPitch), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 };
 
