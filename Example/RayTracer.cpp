@@ -8,7 +8,7 @@
 #include "CubeMap.h"
 
 RayTracer::RayTracer(const int& width, const int& height)
-	: width(width), height(height), camera(width, height) {
+	: camera(width, height) {
 	// -z ¹æÇâ¿¡ ±¤¿ø
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
@@ -193,17 +193,17 @@ void RayTracer::Render(std::vector<glm::vec4>& pixels) {
 	std::fill(pixels.begin(), pixels.end(), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	// ÇÈ¼¿ÀÇ Å©±â
-	const float dx = 2.0f / height;
+	const float dx = 2.0f / camera.height;
 
 #pragma omp parallel for
-	for (int j = 0; j < height; j++)
-		for (int i = 0; i < width; i++) {
+	for (int j = 0; j < camera.height; j++)
+		for (int i = 0; i < camera.width; i++) {
 			const glm::vec3 pixelPosWorld = TransformScreenToWorld(glm::vec2(i, j));
 			// For perspective projection
 
 			// ray¸¦ ÇÈ¼¿ ´ç ÇÏ³ª¸¸ ½î´Â ÄÚµå
 			Ray pixelRay{ pixelPosWorld, glm::normalize(pixelPosWorld - camera.position) };
-			pixels[i + width * j] = glm::vec4(glm::clamp(traceRay(pixelRay, 5), 0.0f, 1.0f), 1.0f);
+			pixels[i + camera.width * j] = glm::vec4(glm::clamp(traceRay(pixelRay, 5), 0.0f, 1.0f), 1.0f);
 
 			// ray¸¦ ¿©·¯°³ ½÷¼­ ½´ÆÛ»ùÇÃ¸µÇÏ´Â ÄÚµå
 			//const auto pixelColor = SuperSample4x(camera.position, pixelPosWorld, dx);

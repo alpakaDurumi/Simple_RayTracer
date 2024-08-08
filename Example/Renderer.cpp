@@ -5,7 +5,7 @@ Renderer::Renderer(HWND window, int width, int height)
 	: rayTracer(width, height) {
 	Initialize(window, width, height);
 	// 화면 크기는 초기 설정값 고정
-	pixels.resize(rayTracer.width * rayTracer.height);
+	pixels.resize(rayTracer.camera.width * rayTracer.camera.height);
 }
 
 void Renderer::Update() {
@@ -145,8 +145,8 @@ void Renderer::Initialize(HWND window, int width, int height)
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.MiscFlags = 0;
 	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	textureDesc.Width = rayTracer.width;
-	textureDesc.Height = rayTracer.height;
+	textureDesc.Width = rayTracer.camera.width;
+	textureDesc.Height = rayTracer.camera.height;
 
 	device->CreateTexture2D(&textureDesc, nullptr, &canvasTexture);
 

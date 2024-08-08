@@ -28,14 +28,12 @@ struct Camera {
 	}
 };
 
-class RayTracer
-{
+class RayTracer {
 public:
-	int width, height;											// 해상도
-	Light light;												// 광원
-	std::vector<std::shared_ptr<Object>> objects;				// 물체 목록
-	std::shared_ptr<CubeMap> skyBox;
-	Camera camera;
+	Light light;											// 광원
+	std::vector<std::shared_ptr<Object>> objects;			// 물체 목록
+	std::shared_ptr<CubeMap> skyBox;						// 스카이박스
+	Camera camera;											// 카메라
 
 	RayTracer(const int& width, const int& height);
 	Hit FindClosestCollision(const Ray& ray);
