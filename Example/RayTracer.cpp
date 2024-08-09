@@ -12,9 +12,6 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// -z 방향에 광원
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
-	// 오른쪽으로 90도 회전
-	camera.updateViewMatrix(90.0f, 0.0f);
-
 	// 초록색 구
 	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 0.5f);
 	sphere1->material->refraction = 1.0f;
@@ -227,8 +224,11 @@ glm::vec3 RayTracer::TransformScreenToWorld(const glm::vec2& screenPos) {
 	const float worldX = ndcX * camera.aspectRatio * tan(glm::radians(camera.fov / 2.0f));
 	const float worldY = ndcY * tan(glm::radians(camera.fov / 2.0f));
 
-	// 카메라 회전 행렬을 기반으로 회전
-	glm::vec4 worldDir = camera.viewMatrix * glm::vec4(worldX, worldY, 1.0f, 0.0f);
+	// 카메라 뷰 행렬
+	glm::mat4 viewMatrix = glm::lookAt(camera.position, camera.position + camera.forward, camera.up);
+
+	// 역행렬을 적용하여 월드 좌표계에서의 회전(방향) 계산
+	glm::vec4 worldDir = glm::inverse(viewMatrix) * glm::vec4(worldX, worldY, 1.0f, 0.0f);
 	
 	// 카메라 위치를 더하여 최종 월드 좌표 계산
 	glm::vec3 worldPos = camera.position + glm::vec3(worldDir);

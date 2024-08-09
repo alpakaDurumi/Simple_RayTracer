@@ -11,6 +11,9 @@
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+// WndProc에서 접근 가능하도록 전역으로 선언
+std::unique_ptr<Renderer> renderer;
+
 int main()
 {
 	// 해상도 지정
@@ -54,7 +57,8 @@ int main()
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	UpdateWindow(hwnd);
 
-	auto renderer = std::make_unique<Renderer>(hwnd, width, height);
+	// 렌더러 객체 생성
+	renderer = std::make_unique<Renderer>(hwnd, width, height);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -178,6 +182,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
+	// static으로 한 이유는 윈도우 프로시저가 계속 호출되어도 기존 값을 유지시키기 위해서이다.
+	static bool isDragging = false;
+	static POINT lastMousePos{ 0, 0 };
+
 	switch (msg)
 	{
 	case WM_SIZE:
@@ -188,10 +196,37 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		break;
 	case WM_MOUSEMOVE:
-		// std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
+		if (isDragging) {
+			POINT currentMousePos;
+			GetCursorPos(&currentMousePos);
+			// ScreenToClient는 전체 화면 기준인 커서의 좌표를 해당 클라이언트(윈도우) 기준으로 좌표를 변환해주는 함수
+			ScreenToClient(hWnd, &currentMousePos);
+
+			float deltaX = static_cast<float>(currentMousePos.x - lastMousePos.x);
+			float deltaY = static_cast<float>(currentMousePos.y - lastMousePos.y);
+
+			// 민감도
+			float sensitivity = 0.1f;
+
+			// 드래그 중 커서 좌표가 증가하면 반시계 방향으로 회전해야하므로, 각각 음수를 붙여서 전달
+			renderer->rayTracer.camera.updateRotation(-deltaX * sensitivity, -deltaY * sensitivity);
+
+			// 마지막 위치 업데이트
+			lastMousePos = currentMousePos;
+
+			//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
+		}
+		break;
+	// 마우스 왼쪽 버튼을 누르는 순간 마지막 마우스 위치를 저장
+	case WM_LBUTTONDOWN:
+		isDragging = true;
+		GetCursorPos(&lastMousePos);
+		ScreenToClient(hWnd, &lastMousePos);
+		//std::cout << "WM_LBUTTONDown Left mouse button" << std::endl;
 		break;
 	case WM_LBUTTONUP:
-		// std::cout << "WM_LBUTTONUP Left mouse button" << std::endl;
+		isDragging = false;
+		//std::cout << "WM_LBUTTONUP Left mouse button" << std::endl;
 		break;
 	case WM_RBUTTONUP:
 		// std::cout << "WM_RBUTTONUP Right mouse button" << std::endl;
