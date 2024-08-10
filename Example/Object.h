@@ -36,5 +36,7 @@ public:
     void setAmbientFactor(const float& ambientFactor);
     void updatePhong();
     void configureSpecular(const float& specularPower, const float& specularCoefficient);
+    void setReflection(const float& reflection);
+    void setRefraction(const float& refraction);
     virtual Hit CheckRayCollision(const Ray& ray) = 0;
 };

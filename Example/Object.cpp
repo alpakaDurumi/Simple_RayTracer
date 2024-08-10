@@ -33,3 +33,13 @@ void Object::configureSpecular(const float& specularPower, const float& specular
     material->specularPower = specularPower;
     material->specularCoefficient = specularCoefficient;
 }
+
+// 반사 조절 함수
+void Object::setReflection(const float& reflection) {
+    material->reflection = reflection;
+}
+
+// 굴절 조절 함수
+void Object::setRefraction(const float& refraction) {
+    material->refraction = refraction;
+}

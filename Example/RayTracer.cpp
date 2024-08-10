@@ -36,15 +36,15 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// -z 방향에 광원
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
-	// 초록색 구
+	// 굴절 테스트
 	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 0.5f);
-	sphere1->material->refraction = 1.0f;
+	sphere1->setRefraction(1.0f);
 	objects.push_back(sphere1);
 
-	// 보라색 구
+	// 반사 테스트
 	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 2.0f), 0.5f);
 	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
-	sphere2->material->reflection = 0.5f;
+	sphere2->setReflection(0.5f);
 	objects.push_back(sphere2);
 
 	// 흰색 사각형
