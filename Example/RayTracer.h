@@ -29,29 +29,9 @@ struct Camera {
 	int height;				// 세로 해상도
 	float aspectRatio;		// 종횡비
 
-	Camera(const int& width, const int& height)
-		: width(width), height(height) {
-		aspectRatio = static_cast<float>(width) / height;
-	}	
+	Camera(const int& width, const int& height);
 	
-	// 회전 업데이트 함수. 시계 방향 글로벌 회전
-	// 매번 새 회전 행렬을 계산하는 방식
-	// 회전 행렬을 누적하는 방식에 비해 느리지만, 수치 오차가 누적되지 않아 정밀도가 높다
-	void updateRotation(const float& deltaYaw, const float& deltaPitch) {
-		// yaw와 pitch 업데이트
-		yaw += deltaYaw;
-		pitch += deltaPitch;
-
-		// 회전 행렬 계산
-		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f));	// yaw
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(pitch), glm::vec3(1.0f, 0.0f, 0.0f));				// pitch
-
-		// 카메라 방향 벡터 업데이트
-		forward = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f)));
-		right = glm::normalize(glm::vec3(rotationMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)));
-		// roll 회전은 수행하지 않지만, forward와 right가 변경되므로 그에 맞게 업데이트가 필요
-		up = glm::normalize(glm::cross(forward, right));
-	}
+	void updateRotation(const float& deltaYaw, const float& deltaPitch);
 };
 
 class RayTracer {
