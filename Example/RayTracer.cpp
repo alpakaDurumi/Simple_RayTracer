@@ -39,6 +39,7 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// 굴절 테스트
 	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 0.5f);
 	sphere1->setRefraction(1.0f);
+	sphere1->setMaterialType(MaterialType::Glass);
 	objects.push_back(sphere1);
 
 	// 반사 테스트
@@ -173,7 +174,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 		// refraction이 설정되어 있다면
 		if (hit.material->refraction > 0.0f) {
 			// 물체의 밖에서 안으로 굴절되는 경우의 값
-			float relativeRefractiveIndex = 1.5f;
+			float relativeRefractiveIndex = hit.material->refractiveIndex / 1.0f;
 			glm::vec3 normal = hit.normal;
 
 			// 물체의 안에서 밖으로 굴절되는 경우, 위 두 값을 반대로 설정
