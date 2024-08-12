@@ -44,6 +44,8 @@ public:
 	RayTracer(const int& width, const int& height);
 	Hit FindClosestCollision(const Ray& ray);
 	glm::vec3 traceRay(const Ray& ray, const int recurseLevel);
+	float fresnelSchlick(const float& n1, const float& n2, const float& cosTheta);
+	void calculateReflectanceAndTransmittance(const float& n1, const float& n2, const float& cosTheta, float& reflectance, float& transmittance);
 	void Render(std::vector<glm::vec4>& pixels);
 	glm::vec3 TransformScreenToWorld(const glm::vec2& screenPos);
 	glm::vec3 SuperSample4x(const glm::vec3& cameraPos, const glm::vec3& pixelPos, const float dx);

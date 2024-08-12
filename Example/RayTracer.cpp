@@ -213,6 +213,18 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 	return glm::vec3(0.0f);
 }
 
+// Schlick's approximation
+float RayTracer::fresnelSchlick(const float& n1, const float& n2, const float& cosTheta) {
+	float r0 = glm::pow((n1 - n2) / (n1 + n2), 2.0f);
+	return r0 + (1 - r0) * glm::pow((1 - cosTheta), 5.0f);
+}
+
+// 반사율(reflectance)와 투과율(transmittance) 계산
+void RayTracer::calculateReflectanceAndTransmittance(const float& n1, const float& n2, const float& cosTheta, float& reflectance, float& transmittance) {
+	reflectance = fresnelSchlick(n1, n2, cosTheta);
+	transmittance = 1.0f - reflectance;
+}
+
 // 각 픽셀에 해당하는 월드 좌표계 위치에서 ray를 쏴서 얻은 색상값으로 각 픽셀을 설정
 void RayTracer::Render(std::vector<glm::vec4>& pixels) {
 	std::fill(pixels.begin(), pixels.end(), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
