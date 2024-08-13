@@ -34,14 +34,14 @@ void Object::configureSpecular(const float& specularPower, const float& specular
 	material->specularCoefficient = specularCoefficient;
 }
 
-// 반사 조절 함수
-void Object::setReflection(const float& reflection) {
-	material->reflection = reflection;
+// 반사 설정 함수
+void Object::setReflection(const bool& value) {
+	material->hasReflection = value;
 }
 
-// 굴절 조절 함수
-void Object::setRefraction(const float& refraction) {
-	material->refraction = refraction;
+// 굴절 설정 함수
+void Object::setRefraction(const bool& value) {
+	material->hasRefraction = value;
 }
 
 // 물체 재질 지정 함수

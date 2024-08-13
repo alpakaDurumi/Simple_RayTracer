@@ -36,57 +36,15 @@ RayTracer::RayTracer(const int& width, const int& height)
 	// -z 방향에 광원
 	light = Light{ {0.0f, 0.3f, -0.5f} };
 
-	// 굴절 테스트
-	auto sphere1 = std::make_shared<Sphere>(glm::vec3(-1.0f, 0.0f, 2.0f), 0.5f);
-	sphere1->setRefraction(1.0f);
-	sphere1->setMaterialType(MaterialType::Glass);
-	objects.push_back(sphere1);
-
-	// 반사 테스트
-	auto sphere2 = std::make_shared<Sphere>(glm::vec3(0.5f, 0.0f, 2.0f), 0.5f);
-	sphere2->setColor(glm::vec3{ 1.0f, 0.0f, 1.0f });
-	sphere2->setReflection(0.5f);
-	objects.push_back(sphere2);
-
-	// 흰색 사각형
-	//auto square1 = std::make_shared<Square>(glm::vec3(-4.0f, -1.0f, 0.0f), glm::vec3(-4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 4.0f), glm::vec3(4.0f, -1.0f, 0.0f));
-	//objects.push_back(square1);
-
-	// 텍스처링 테스트용 1
-	//std::vector<glm::vec3> textureImage(4 * 4);
-	//for (int j = 0; j < 4; j++) {
-	//	for (int i = 0; i < 4; i++) {
-	//		if (i % 4 == 0)
-	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 0.0f, 0.0f) * (1.0f + j) * 0.25f;
-	//		else if (i % 4 == 1)
-	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 1.0f, 0.0f) * (1.0f + j) * 0.25f;
-	//		else if (i % 4 == 2)
-	//			textureImage[i + 4 * j] = glm::vec3(0.0f, 0.0f, 1.0f) * (1.0f + j) * 0.25f;
-	//		else
-	//			textureImage[i + 4 * j] = glm::vec3(1.0f, 1.0f, 1.0f) * (1.0f + j) * 0.25f;
-	//	}
-	//}
-	//auto testTexture = std::make_shared<Texture>(4, 4, textureImage);
-	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
-	//testTexture->SetFilterMode(TextureFilterMode::Point);
-
-	// 텍스처링 테스트용 2
-	//Image by freepik https://www.freepik.com/free-ai-image/geometric-seamless-pattern_94949548.htm#fromView=search&page=1&position=0&uuid=4bfff6fb-3412-4780-9681-b7f2c31eaa3b
-	//auto testTexture = std::make_shared<Texture>("geometric-seamless-pattern.jpg");
-	//testTexture->SetAddressMode(TextureAddressMode::Clamp);
-	//testTexture->SetFilterMode(TextureFilterMode::Point);
-
-	//auto squareTest = std::make_shared<Square>(
-	//	glm::vec3(-2.0f, 2.0f, 2.0f), glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(2.0f, -2.0f, 2.0f), glm::vec3(-2.0f, -2.0f, 2.0f),
-	//	glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 0.0f), glm::vec2(4.0f, 4.0f), glm::vec2(0.0f, 4.0f));
-	//squareTest->setTexture(testTexture);
-	//squareTest->configureSpecular(0.0f, 0.0f);
-	//squareTest->setAmbientFactor(1.0f);
-	//objects.push_back(squareTest);
-
 	// 큐브맵
 	std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
 	skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
+
+	auto sphere1 = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, 3.0f), 1.5f);
+	sphere1->setReflection(true);
+	sphere1->setRefraction(true);
+	sphere1->setMaterialType(MaterialType::Glass);
+	objects.push_back(sphere1);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
@@ -162,32 +120,58 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			phongColor += hit.material->spec * specular * hit.material->specularCoefficient;
 		}
 
-		objectColor += phongColor * (1.0f - hit.material->reflection - hit.material->refraction);
+		// 레이의 시작점이 물체의 바깥인지 안인지 구분하기 위함
+		const bool isFromOutside = glm::dot(ray.dir, hit.normal) < 0.0f;
 
-		// reflection이 설정되어 있다면
-		if (hit.material->reflection > 0.0f) {
-			const glm::vec3 reflectedDir = 2.0f * dot(hit.normal, -ray.dir) * hit.normal + ray.dir;
-			Ray reflectionRay{ hit.point + reflectedDir * 1e-4f, reflectedDir };
-			objectColor += traceRay(reflectionRay, recurseLevel - 1) * hit.material->reflection;
+		// 슐릭 근사, 굴절 계산에 사용하기 위한 노멀 벡터
+		const glm::vec3 normal = (isFromOutside) ? hit.normal : -hit.normal;
+
+		// 입사각에 대한 cos
+		const float cosThetaIn = glm::dot(-ray.dir, normal);
+
+		// 반사율과 투과율
+		float reflectance = 0.0f, transmittance = 0.0f;
+
+		// 머티리얼의 반사 유무와 굴절 유무에 따라 두 변수의 값 지정
+		if (hit.material->hasReflection && hit.material->hasRefraction) {
+			// 둘 모두 존재하는 경우 슐릭 근사로 프레넬 계수 계산
+			if(isFromOutside)
+				calculateReflectanceAndTransmittance(1.0f, hit.material->refractiveIndex, cosThetaIn, reflectance, transmittance);
+			else
+				calculateReflectanceAndTransmittance(hit.material->refractiveIndex, 1.0f, cosThetaIn, reflectance, transmittance);
+		}
+		else if (hit.material->hasReflection) {
+			reflectance = 1.0f;
+			transmittance = 0.0f;
+		}
+		else if (hit.material->hasRefraction) {
+			reflectance = 0.0f;
+			transmittance = 1.0f;
+		}
+		else {
+			reflectance = 0.0f;
+			transmittance = 0.0f;
 		}
 
-		// refraction이 설정되어 있다면
-		if (hit.material->refraction > 0.0f) {
-			// 물체의 밖에서 안으로 굴절되는 경우의 값
-			float relativeRefractiveIndex = hit.material->refractiveIndex / 1.0f;
-			glm::vec3 normal = hit.normal;
+		// 매직 넘버를 넣어서 자연스러운 비율을 찾아야 함. 일단 0.1f로 해놓자.
+		objectColor += phongColor * 0.1f;
 
-			// 물체의 안에서 밖으로 굴절되는 경우, 위 두 값을 반대로 설정
-			if (glm::dot(ray.dir, hit.normal) >= 0.0f) {
-				relativeRefractiveIndex = 1.0f / relativeRefractiveIndex;
-				normal = -normal;
-			}
+		// 반사가 설정되어 있다면
+		if (hit.material->hasReflection) {
+			const glm::vec3 reflectedDir = 2.0f * dot(hit.normal, -ray.dir) * hit.normal + ray.dir;
+			Ray reflectionRay{ hit.point + reflectedDir * 1e-4f, reflectedDir };
+			objectColor += traceRay(reflectionRay, recurseLevel - 1) * reflectance;
+		}
 
-			// 입사각
-			const float cosThetaIn = glm::dot(-ray.dir, normal);
+		// 굴절이 설정되어 있다면
+		if (hit.material->hasRefraction) {
+			// 상대 굴절률
+			const float relativeRefractiveIndex = (isFromOutside) ? hit.material->refractiveIndex / 1.0f : 1.0f / hit.material->refractiveIndex;
+
+			// 입사각에 대한 sin
 			const float sinThetaIn = glm::sqrt(1.0f - cosThetaIn * cosThetaIn);
 
-			// 굴절각
+			// 굴절각에 대한 sin, cos
 			const float sinThetaRef = sinThetaIn / relativeRefractiveIndex;
 			const float cosThetaRef = glm::sqrt(1.0f - sinThetaRef * sinThetaRef);
 
@@ -200,7 +184,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			const glm::vec3 refractedDir = glm::normalize(x + y);
 
 			Ray refractionRay{ hit.point + refractedDir * 1e-4f, refractedDir };
-			objectColor += traceRay(refractionRay, recurseLevel) * hit.material->refraction;
+			objectColor += traceRay(refractionRay, recurseLevel) * transmittance;
 		}
 
 		return objectColor;

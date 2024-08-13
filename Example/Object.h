@@ -18,6 +18,7 @@ enum class MaterialType {
 struct Material {
 	// ±âº»°ªÀº Èò»ö
 	glm::vec3 baseColor = glm::vec3(1.0f);
+
 	glm::vec3 amb = glm::vec3(0.2f);        // Ambient color
 	glm::vec3 dif = glm::vec3(0.8f);        // Diffuse color
 	glm::vec3 spec = glm::vec3(1.0f);       // Specular color
@@ -25,12 +26,13 @@ struct Material {
 	float ambientFactor = 0.2f;             // Ambient °è¼ö
 	float specularPower = 40.0f;            // Specular °­µµ
 	float specularCoefficient = 1.0f;       // Specular °è¼ö
-	float reflection = 0.0f;                // ¹Ý»ç
-	float refraction = 0.0f;                // ±¼Àý
-	float refractiveIndex = 1.0f;			// ±¼Àý·ü
 
 	std::shared_ptr<Texture> ambTexture;    // Ambient ÅØ½ºÃ³
 	std::shared_ptr<Texture> difTexture;    // Diffuse ÅØ½ºÃ³
+
+	bool hasReflection = false;				// ¹Ý»ç À¯¹«
+	bool hasRefraction = false;				// ±¼Àý À¯¹«
+	float refractiveIndex = 1.0f;			// ±¼Àý·ü
 };
 
 class Object {
@@ -43,8 +45,8 @@ public:
 	void setAmbientFactor(const float& ambientFactor);
 	void updatePhong();
 	void configureSpecular(const float& specularPower, const float& specularCoefficient);
-	void setReflection(const float& reflection);
-	void setRefraction(const float& refraction);
+	void setReflection(const bool& value);
+	void setRefraction(const bool& value);
 	void setMaterialType(const MaterialType& type);
 	virtual Hit CheckRayCollision(const Ray& ray) = 0;
 };
