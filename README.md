@@ -43,6 +43,7 @@ Try to implement the following features
 - [GLM](https://github.com/g-truc/glm)
 - DirectX (Not yet studied in depth)
 - Cube map texture : https://www.humus.name/index.php?page=Textures&ID=95
+- Normal map texture : https://3dtextures.me/2024/07/18/stylized-stone-floor-006/
 
 ---
 
@@ -92,3 +93,4 @@ Try to implement the following features
 - [GLM](https://github.com/g-truc/glm)
 - DirectX (아직 자세히 배우지 않음)
 - 큐브 맵 텍스처 : https://www.humus.name/index.php?page=Textures&ID=95
+- 노멀 맵 텍스처 : https://3dtextures.me/2024/07/18/stylized-stone-floor-006/
