@@ -83,9 +83,6 @@
     <FxCompile Include="PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="geometric-seamless-pattern.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="negx.jpg">
       <Filter>Resource Files</Filter>
     </Image>
@@ -102,6 +99,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="posz.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Stylized_Stone_Floor_006_basecolor.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Stylized_Stone_Floor_006_normal.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

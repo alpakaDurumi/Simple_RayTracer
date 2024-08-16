@@ -177,13 +177,14 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="geometric-seamless-pattern.jpg" />
     <Image Include="negx.jpg" />
     <Image Include="negy.jpg" />
     <Image Include="negz.jpg" />
     <Image Include="posx.jpg" />
     <Image Include="posy.jpg" />
     <Image Include="posz.jpg" />
+    <Image Include="Stylized_Stone_Floor_006_basecolor.png" />
+    <Image Include="Stylized_Stone_Floor_006_normal.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
