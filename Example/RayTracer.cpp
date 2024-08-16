@@ -34,20 +34,28 @@ void Camera::updateRotation(const float& deltaYaw, const float& deltaPitch) {
 RayTracer::RayTracer(const int& width, const int& height)
 	: camera(width, height) {
 	// -z 방향에 광원
-	light = Light{ {0.0f, 0.3f, -0.5f} };
+	light = Light{ {0.0f, 0.0f, 0.0f} };
 
 	// 큐브맵
 	std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
 	skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
 
+	// 반사/굴절 테스트용 구
 	//auto sphere1 = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, 3.0f), 1.5f);
 	//sphere1->setReflection(true);
 	//sphere1->setRefraction(true);
 	//sphere1->setMaterialType(MaterialType::Glass);
 	//objects.push_back(sphere1);
 
+	// 텍스처
+	auto floorTexture = std::make_shared<Texture>("Stylized_Stone_Floor_006_basecolor.png");
+	auto floorNormalMap = std::make_shared<Texture>("Stylized_Stone_Floor_006_normal.png");
+
 	// 노멀 맵 테스트
-	auto square1 = std::make_shared<Square>(glm::vec3(-5.0f, -3.0f, -5.0f), glm::vec3(-5.0f, -3.0f, 5.0f), glm::vec3(5.0f, -3.0f, 5.0f), glm::vec3(4.0f, -3.0f, -5.0f));
+	auto square1 = std::make_shared<Square>(glm::vec3(-2.5f, -2.5f, 3.0f), glm::vec3(-2.5f, 2.5f, 3.0f), glm::vec3(2.5f, 2.5f, 3.0f), glm::vec3(2.5f, -2.5f, 3.0f));
+	square1->setTexture(floorTexture, nullptr, floorNormalMap);
+	square1->setAmbientFactor(0.5f);
+	square1->configureSpecular(10.0f, 0.1f);
 	objects.push_back(square1);
 }
 
@@ -98,6 +106,9 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 
 		const glm::vec3 dirToLight = glm::normalize(light.pos - hit.point);
 
+		// 노멀 맵 유무에 따라 노멀 벡터 설정
+		const glm::vec3 normal = (hit.material->normalMap) ? transformNormalMap(hit.material->normalMap->Sample(hit.uv)) : hit.normal;
+
 		// 그림자 계산을 위한 Ray
 		Ray shadowRay{ hit.point + dirToLight * 1e-4f, dirToLight };
 		// 충돌 지점에서 광원 사이를 막는 물체까지의 거리
@@ -106,7 +117,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 		// 충돌 지점과 광원 사이에 가로막는 물체가 없다면 diffuse와 specular를 추가로 계산
 		if (distanceToObstacle < 0.0f || glm::length(light.pos - hit.point) < distanceToObstacle) {
 			// Diffuse 계산
-			const float diff = glm::max(dot(hit.normal, dirToLight), 0.0f);
+			const float diff = glm::max(dot(normal, dirToLight), 0.0f);
 
 			// diffuse texture가 지정되어 있다면
 			if (hit.material->difTexture) {
@@ -117,7 +128,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			}
 
 			// Specular 계산
-			const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, hit.normal) * hit.normal - dirToLight;
+			const glm::vec3 reflectDir = 2.0f * glm::dot(dirToLight, normal) * normal - dirToLight;
 			const float specular = glm::pow(glm::max(glm::dot(-ray.dir, reflectDir), 0.0f), hit.material->specularPower);
 
 			// specular texture는 사용 X
@@ -125,13 +136,13 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 		}
 
 		// 레이의 시작점이 물체의 바깥인지 안인지 구분하기 위함
-		const bool isFromOutside = glm::dot(ray.dir, hit.normal) < 0.0f;
+		const bool isFromOutside = glm::dot(ray.dir, normal) < 0.0f;
 
 		// 슐릭 근사, 굴절 계산에 사용하기 위한 노멀 벡터
-		const glm::vec3 normal = (isFromOutside) ? hit.normal : -hit.normal;
+		const glm::vec3 normalForRefraction = (isFromOutside) ? normal : -normal;
 
 		// 입사각에 대한 cos
-		const float cosThetaIn = glm::dot(-ray.dir, normal);
+		const float cosThetaIn = glm::dot(-ray.dir, normalForRefraction);
 
 		// 반사율과 투과율
 		float reflectance = 0.0f, transmittance = 0.0f;
@@ -155,7 +166,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 
 		// 반사가 설정되어 있다면
 		if (hit.material->hasReflection) {
-			const glm::vec3 reflectedDir = 2.0f * dot(hit.normal, -ray.dir) * hit.normal + ray.dir;
+			const glm::vec3 reflectedDir = 2.0f * dot(normal, -ray.dir) * normal + ray.dir;
 			Ray reflectionRay{ hit.point + reflectedDir * 1e-4f, reflectedDir };
 			objectColor += traceRay(reflectionRay, recurseLevel - 1) * reflectance;
 		}
@@ -173,9 +184,9 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			const float cosThetaRef = glm::sqrt(1.0f - sinThetaRef * sinThetaRef);
 
 			// 굴절 방향의 x 성분(방향 * 크기)
-			const glm::vec3 x = glm::normalize(cosThetaIn * normal + ray.dir) * sinThetaRef;
+			const glm::vec3 x = glm::normalize(cosThetaIn * normalForRefraction + ray.dir) * sinThetaRef;
 			// 굴절 방향의 y 성분(방향 * 크기)
-			const glm::vec3 y = -normal * cosThetaRef;
+			const glm::vec3 y = -normalForRefraction * cosThetaRef;
 
 			// 굴절 방향
 			const glm::vec3 refractedDir = glm::normalize(x + y);
@@ -270,4 +281,10 @@ glm::vec3 RayTracer::SuperSample4x(const glm::vec3& cameraPos, const glm::vec3& 
 
 	// 평균을 내서 반환
 	return pixelColor * 0.25f;
+}
+
+// 노멀 맵 텍스처 값을 노멀 벡터 형태로 변환하는 함수
+glm::vec3 RayTracer::transformNormalMap(const glm::vec3& value) {
+	glm::vec3 transformed = glm::vec3(2.0f * value.x - 1.0f, 2.0f * value.y - 1.0f, 2.0f * value.z - 1.0f);
+	return -glm::normalize(transformed);
 }
