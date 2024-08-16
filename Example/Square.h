@@ -16,5 +16,8 @@ public:
         const std::shared_ptr<Material>& mat = nullptr);
 
     Hit CheckRayCollision(const Ray& ray) override;
-    void setTexture(const std::shared_ptr<Texture>& ambTexture = nullptr, const std::shared_ptr<Texture>& difTexture = nullptr);
+    void setTexture(
+        const std::shared_ptr<Texture>& ambTexture = nullptr,
+        const std::shared_ptr<Texture>& difTexture = nullptr,
+        const std::shared_ptr<Texture>& normalMap = nullptr);
 };

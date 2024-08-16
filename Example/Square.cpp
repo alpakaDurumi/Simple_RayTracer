@@ -26,9 +26,14 @@ Hit Square::CheckRayCollision(const Ray& ray) {
 }
 
 // 텍스처 지정 함수
-void Square::setTexture(const std::shared_ptr<Texture>& ambTexture, const std::shared_ptr<Texture>& difTexture) {
+void Square::setTexture(
+    const std::shared_ptr<Texture>& ambTexture,
+    const std::shared_ptr<Texture>& difTexture,
+    const std::shared_ptr<Texture>& normalMap) {
     if (ambTexture)
         material->ambTexture = ambTexture;
     if (difTexture)
         material->difTexture = difTexture;
+    if (normalMap)
+        material->normalMap = normalMap;
 }

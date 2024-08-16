@@ -29,6 +29,7 @@ struct Material {
 
 	std::shared_ptr<Texture> ambTexture;    // Ambient 텍스처
 	std::shared_ptr<Texture> difTexture;    // Diffuse 텍스처
+	std::shared_ptr<Texture> normalMap;		// 노멀 맵 텍스처
 
 	bool hasReflection = false;				// 반사 유무
 	bool hasRefraction = false;				// 굴절 유무
