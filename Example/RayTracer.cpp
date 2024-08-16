@@ -40,11 +40,15 @@ RayTracer::RayTracer(const int& width, const int& height)
 	std::array<std::string, 6> cubeMapTextureFiles{ "posz.jpg","negz.jpg","posx.jpg","negx.jpg","posy.jpg", "negy.jpg" };
 	skyBox = std::make_shared<CubeMap>(cubeMapTextureFiles);
 
-	auto sphere1 = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, 3.0f), 1.5f);
-	sphere1->setReflection(true);
-	sphere1->setRefraction(true);
-	sphere1->setMaterialType(MaterialType::Glass);
-	objects.push_back(sphere1);
+	//auto sphere1 = std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, 3.0f), 1.5f);
+	//sphere1->setReflection(true);
+	//sphere1->setRefraction(true);
+	//sphere1->setMaterialType(MaterialType::Glass);
+	//objects.push_back(sphere1);
+
+	// 노멀 맵 테스트
+	auto square1 = std::make_shared<Square>(glm::vec3(-5.0f, -3.0f, -5.0f), glm::vec3(-5.0f, -3.0f, 5.0f), glm::vec3(5.0f, -3.0f, 5.0f), glm::vec3(4.0f, -3.0f, -5.0f));
+	objects.push_back(square1);
 }
 
 // ray가 충돌한 지점 중 가장 가까운 지점에 대한 Hit 반환
@@ -132,7 +136,7 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 		// 반사율과 투과율
 		float reflectance = 0.0f, transmittance = 0.0f;
 
-		// 머티리얼의 반사 유무와 굴절 유무에 따라 두 변수의 값 지정
+		// 머티리얼의 반사 유무와 굴절 유무에 따라 반사율과 투과율 지정
 		if (hit.material->hasReflection && hit.material->hasRefraction) {
 			// 둘 모두 존재하는 경우 슐릭 근사로 프레넬 계수 계산
 			if(isFromOutside)
@@ -140,21 +144,14 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, const int recurseLevel) {
 			else
 				calculateReflectanceAndTransmittance(hit.material->refractiveIndex, 1.0f, cosThetaIn, reflectance, transmittance);
 		}
-		else if (hit.material->hasReflection) {
-			reflectance = 1.0f;
-			transmittance = 0.0f;
-		}
-		else if (hit.material->hasRefraction) {
-			reflectance = 0.0f;
-			transmittance = 1.0f;
-		}
 		else {
-			reflectance = 0.0f;
-			transmittance = 0.0f;
+			reflectance = (hit.material->hasReflection) ? 1.0f : 0.0f;
+			transmittance = (hit.material->hasRefraction) ? 1.0f : 0.0f;
 		}
 
-		// 매직 넘버를 넣어서 자연스러운 비율을 찾아야 함. 일단 0.1f로 해놓자.
-		objectColor += phongColor * 0.1f;
+		// 머티리얼의 반사 유무와 굴절 유무에 따라 phongColor의 배율 지정
+		// 반사와 굴절이 둘 다 없는 경우 그대로 더해주며, 그 외의 경우 0.1의 비율로 더한다
+		objectColor += phongColor * ((hit.material->hasReflection || hit.material->hasRefraction) ? 0.1f : 1.0f);
 
 		// 반사가 설정되어 있다면
 		if (hit.material->hasReflection) {
